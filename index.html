@@ -1,0 +1,1602 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="롤 실시간 밴픽 승률 예측, 가상 매치 시뮬레이터, 2026 월즈 대진표 예측, 무료 승부예측 챌린지">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>리프트 오라클</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: broadcast draft board — blue/red flanks around a champion grid, analysis deck below. Single dark "hextech" world. */
+:root{
+  color-scheme:dark;
+  --bg:#0a1016; --bg2:#0e161d; --panel:#121c25; --panel2:#17242f; --line:#24343f; --line2:#344a59;
+  --text:#e9e3d5; --muted:#8d9ca7; --dim:#5f6f7a;
+  --gold:#c8aa6e; --gold2:#ecdcb0; --goldDim:rgba(200,170,110,.14);
+  --blue:#4b9fea; --blueDim:rgba(75,159,234,.16); --red:#e8574e; --redDim:rgba(232,87,78,.16);
+  --good:#52c08d; --warn:#e3a84b;
+  --f-disp:"Barlow Condensed","Arial Narrow",sans-serif;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --r:6px;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--text);font-family:var(--f-body);font-size:14px;line-height:1.55;
+  background:radial-gradient(1200px 500px at 50% -200px,rgba(200,170,110,.08),transparent 70%),var(--bg);min-height:100vh}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg2)}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.wrap{max-width:1360px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.num{font-family:var(--f-disp);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.muted{color:var(--muted)} .dim{color:var(--dim)}
+.cb{color:var(--blue)} .cr{color:var(--red)} .cg{color:var(--gold)}
+
+/* header */
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(14,22,29,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:center;gap:20px;padding-block:10px;flex-wrap:wrap}
+.brand{display:flex;align-items:baseline;gap:10px;text-decoration:none;color:inherit}
+.brand b{font-family:var(--f-disp);font-weight:700;font-size:24px;letter-spacing:.14em;color:var(--gold2)}
+.brand span{font-size:12px;color:var(--muted)}
+nav.tabs{display:flex;gap:4px;flex-wrap:wrap}
+nav.tabs a{padding:7px 14px;border-radius:4px;color:var(--muted);text-decoration:none;font-weight:600;font-size:13.5px;border:1px solid transparent}
+nav.tabs a:hover{color:var(--text)}
+nav.tabs a.on{color:var(--gold2);border-color:var(--line2);background:var(--goldDim)}
+.stamp{margin-left:auto;font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+.stamp i{font-style:normal;color:var(--gold)}
+
+main{padding-block:22px 60px}
+section.view[hidden]{display:none}
+h2.vt{font-family:var(--f-disp);font-weight:700;font-size:30px;letter-spacing:.04em;margin:0;color:var(--gold2);text-wrap:balance}
+.vhead{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.vhead p{margin:4px 0 0;color:var(--muted);max-width:70ch}
+.lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-width:0}
+.card h3{margin:0 0 12px;font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;justify-content:space-between}
+.card h3 small{font-weight:500;color:var(--muted);font-size:12px}
+.btn{background:var(--panel2);border:1px solid var(--line2);border-radius:4px;padding:7px 12px;cursor:pointer;font-weight:600;font-size:13px;white-space:nowrap}
+.btn:hover{border-color:var(--gold);color:var(--gold2)}
+.btn.pri{background:linear-gradient(180deg,#d8bd82,#a8894f);color:#1a1408;border-color:#e9d39c}
+.btn.pri:hover{color:#000}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+select,input[type=search],input[type=text]{background:var(--bg2);border:1px solid var(--line2);border-radius:4px;padding:6px 8px;min-width:0}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;padding:2px 7px;border-radius:999px;border:1px solid var(--line2);color:var(--muted);white-space:nowrap}
+.chip.g{color:var(--gold2);border-color:rgba(200,170,110,.5);background:var(--goldDim)}
+.chip.b{color:var(--blue);border-color:rgba(75,159,234,.5);background:var(--blueDim)}
+.chip.r{color:var(--red);border-color:rgba(232,87,78,.5);background:var(--redDim)}
+.chip.ok{color:var(--good);border-color:rgba(82,192,141,.5)}
+
+/* champion tile */
+.ct{--h:40;display:inline-grid;place-items:center;width:40px;height:40px;border-radius:4px;flex:none;
+  background:linear-gradient(150deg,hsl(var(--h) 42% 34%),hsl(var(--h) 48% 13%));border:1px solid hsl(var(--h) 40% 46%);
+  color:var(--gold2);font-weight:700;font-size:14px;letter-spacing:-.02em;box-shadow:inset 0 0 0 1px rgba(0,0,0,.35);position:relative;overflow:hidden}
+.ct::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.12),transparent 45%)}
+.ct.sm{width:28px;height:28px;font-size:11px}
+.ct.lg{width:56px;height:56px;font-size:19px}
+.ct.xl{width:64px;height:64px;font-size:21px}
+.ct.empty{background:var(--bg2);border:1px dashed var(--line2);color:var(--dim)}
+
+/* team setup */
+.setup{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.tcard{border-top:3px solid var(--blue)}
+.tcard.red{border-top-color:var(--red)}
+.tcard .trow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.tcard .trow select{flex:1;min-width:150px}
+.lineup{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.lu{background:var(--bg2);border:1px solid var(--line);border-radius:4px;padding:6px;min-width:0}
+.lu .lbl{font-size:10px;display:flex;justify-content:space-between}
+.lu select{width:100%;margin-top:4px;padding:4px;font-size:12.5px}
+.lu .rt{font-size:11px;color:var(--muted);margin-top:3px;display:flex;justify-content:space-between}
+.lu.warn{border-color:var(--warn)}
+
+/* draft board */
+.board{background:linear-gradient(180deg,#0d151c,#0b1218);border:1px solid var(--line2);border-radius:8px;overflow:hidden}
+.bh{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);
+  background:linear-gradient(90deg,var(--blueDim),transparent 35%,transparent 65%,var(--redDim))}
+.bh .tn{display:flex;align-items:center;gap:10px;min-width:0}
+.bh .tn.r{justify-content:flex-end;text-align:right}
+.bh .tn b{font-family:var(--f-disp);font-size:26px;letter-spacing:.06em;line-height:1}
+.bh .tn small{display:block;color:var(--muted);font-size:12px}
+.bh .tn .wp{font-family:var(--f-disp);font-size:34px;font-weight:700;line-height:1}
+.phase{text-align:center;min-width:170px}
+.phase .p1{font-family:var(--f-disp);font-size:13px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
+.phase .p2{font-weight:700;font-size:15px}
+.phase .tm{font-family:var(--f-disp);font-size:30px;font-weight:700;line-height:1;color:var(--gold2)}
+.bans{display:flex;justify-content:space-between;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.bans .bs{display:flex;gap:6px;align-items:center}
+.bans .bs .gap{width:10px}
+.banslot{width:40px;height:40px;border-radius:4px;border:1px solid var(--line2);background:var(--bg2);position:relative;display:grid;place-items:center}
+.banslot .ct{filter:grayscale(.85) brightness(.7)}
+.banslot.has::before{content:"";position:absolute;inset:0;z-index:2;background:linear-gradient(135deg,transparent 46%,rgba(232,87,78,.9) 47%,rgba(232,87,78,.9) 53%,transparent 54%)}
+.banslot.act{border-color:var(--gold);box-shadow:0 0 0 2px var(--goldDim),0 0 18px rgba(200,170,110,.35);animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 2px var(--goldDim),0 0 6px rgba(200,170,110,.15)}}
+.bmain{display:grid;grid-template-columns:250px minmax(0,1fr) 250px}
+.picks{min-width:0}
+.pk{min-width:0}
+.picks{display:flex;flex-direction:column}
+.pk{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--line);min-height:72px;cursor:pointer;position:relative;background:linear-gradient(90deg,var(--blueDim),transparent 80%)}
+.picks.red .pk{flex-direction:row-reverse;text-align:right;background:linear-gradient(270deg,var(--redDim),transparent 80%)}
+.pk .pi{min-width:0;flex:1}
+.pk .pi .lbl{font-size:10px}
+.pk .pi b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pk .pi b .chip{font-size:10px;padding:0 5px;vertical-align:1px}
+.pk .pi span{font-size:12px;color:var(--muted)}
+.pk.sel{outline:2px solid var(--gold);outline-offset:-2px}
+.picks.act .pk:not(.has){background:linear-gradient(90deg,rgba(200,170,110,.18),transparent 85%)}
+.picks.red.act .pk:not(.has){background:linear-gradient(270deg,rgba(200,170,110,.18),transparent 85%)}
+.pk .pf{font-size:11px}
+.center{border-left:1px solid var(--line);border-right:1px solid var(--line);padding:12px;min-width:0;display:flex;flex-direction:column;gap:10px}
+.tools{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.rf{display:flex;gap:3px}
+.rf button{background:var(--bg2);border:1px solid var(--line);border-radius:4px;padding:5px 9px;cursor:pointer;font-size:12.5px;color:var(--muted)}
+.rf button.on{color:var(--gold2);border-color:var(--gold)}
+.tools input{flex:1;min-width:120px}
+.reco{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px;padding:8px;border:1px solid var(--line);border-radius:4px;background:var(--bg2)}
+.reco .ri{display:flex;align-items:center;gap:5px;cursor:pointer;padding:2px 6px 2px 2px;border-radius:4px;border:1px solid transparent}
+.reco .ri:hover{border-color:var(--gold)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(66px,1fr));gap:6px;max-height:430px;overflow:auto;padding-right:4px}
+.gc{display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 2px;border-radius:4px;cursor:pointer;border:1px solid transparent;background:none;position:relative}
+.gc:hover:not(:disabled){border-color:var(--gold);background:var(--goldDim)}
+.gc .ct{width:48px;height:48px;font-size:16px}
+.gc .nm{font-size:11px;line-height:1.2;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:64px}
+.gc .pr{position:absolute;top:2px;right:4px;font-size:9.5px;font-family:var(--f-disp);color:var(--gold);background:rgba(10,16,22,.85);padding:0 3px;border-radius:2px}
+.gc:disabled{opacity:.22;cursor:not-allowed}
+.gc.fl:disabled{opacity:.35}
+.gc.fl::after{content:"F";position:absolute;bottom:20px;left:4px;font-size:9px;color:var(--warn);font-weight:700}
+.fear{display:flex;gap:4px;flex-wrap:wrap;align-items:center;font-size:12px}
+
+/* analysis */
+.wpbar{height:30px;border-radius:4px;overflow:hidden;display:flex;background:var(--bg2);border:1px solid var(--line)}
+.wpbar div{display:flex;align-items:center;padding:0 10px;font-family:var(--f-disp);font-weight:700;font-size:17px;transition:width .5s ease}
+.wpbar .b{background:linear-gradient(90deg,#1f4f7a,#3d86c6);justify-content:flex-start}
+.wpbar .r{background:linear-gradient(270deg,#7a2622,#c4483f);justify-content:flex-end}
+.deck{display:grid;grid-template-columns:repeat(12,1fr);gap:14px;margin-top:14px}
+.s12{grid-column:span 12}.s8{grid-column:span 8}.s7{grid-column:span 7}.s6{grid-column:span 6}.s5{grid-column:span 5}.s4{grid-column:span 4}
+.phases{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.ph{background:var(--bg2);border:1px solid var(--line);border-radius:4px;padding:10px}
+.ph .v{font-family:var(--f-disp);font-size:28px;font-weight:700;line-height:1.1}
+.ph p{margin:4px 0 0;font-size:12px;color:var(--muted)}
+.mini{height:6px;border-radius:3px;background:var(--redDim);overflow:hidden;margin-top:6px}
+.mini i{display:block;height:100%;background:var(--blue)}
+.lane{display:grid;grid-template-columns:minmax(0,1fr) 44px minmax(0,1.3fr) 44px minmax(0,1fr);gap:8px;align-items:center;padding:7px 0;border-bottom:1px dashed var(--line)}
+.lane:last-child{border-bottom:0}
+.lane .sd{display:flex;align-items:center;gap:6px;min-width:0;font-size:12.5px}
+.lane .sd.r{flex-direction:row-reverse;text-align:right}
+.lane .sd div{min-width:0}
+.lane .sd b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lane .sd span{color:var(--muted);font-size:11.5px;white-space:nowrap}
+.lane .pc{font-family:var(--f-disp);font-weight:700;font-size:17px;text-align:center}
+.lane .bar{height:8px;border-radius:4px;background:var(--red);overflow:hidden;position:relative}
+.lane .bar i{position:absolute;left:0;top:0;bottom:0;background:var(--blue)}
+.lane .bar::after{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--gold)}
+.lane .rl{text-align:center;font-size:11px;color:var(--muted);margin-top:3px}
+.kv{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.kv div{background:var(--bg2);border:1px solid var(--line);border-radius:4px;padding:10px}
+.kv b{display:block;font-family:var(--f-disp);font-size:24px;line-height:1.1}
+.kv span{font-size:11.5px;color:var(--muted)}
+ul.pts{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px}
+ul.pts li{padding:9px 11px;border-left:3px solid var(--gold);background:var(--bg2);border-radius:0 4px 4px 0;font-size:13px}
+ul.pts li b{color:var(--gold2)}
+ul.pts li.b{border-left-color:var(--blue)} ul.pts li.r{border-left-color:var(--red)}
+.comp{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.comp .cs h4{margin:0 0 6px;font-size:13px}
+.dmg{height:10px;border-radius:5px;overflow:hidden;display:flex;margin:6px 0}
+.dmg i{display:block;height:100%}
+.tagrow{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.spark{width:100%;height:110px;display:block}
+.note{font-size:12px;color:var(--muted);margin-top:10px}
+
+/* virtual */
+.vgrid{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:start}
+.vs{font-family:var(--f-disp);font-size:42px;font-weight:700;color:var(--gold);align-self:center;text-align:center}
+.vrow{display:grid;grid-template-columns:44px minmax(0,1fr) minmax(0,.9fr);gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--line)}
+.vrow:last-child{border-bottom:0}
+.vrow select{width:100%;font-size:12.5px}
+.vrow .rk{font-size:11px;color:var(--muted)}
+.tl{max-height:360px;overflow:auto;display:flex;flex-direction:column;gap:2px;font-size:12.5px;padding-right:4px}
+.tl div{display:grid;grid-template-columns:44px 1fr;gap:8px;padding:4px 6px;border-radius:3px}
+.tl div.b{background:var(--blueDim)} .tl div.r{background:var(--redDim)}
+.tl em{font-style:normal;font-family:var(--f-disp);color:var(--muted)}
+.series{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.series div{background:var(--bg2);border:1px solid var(--line);border-radius:4px;padding:10px;text-align:center}
+.series b{font-family:var(--f-disp);font-size:26px;display:block}
+
+/* worlds */
+.wtop{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.wtop div{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:10px 12px}
+.wtop b{display:block;font-size:15px}
+.wtop span{font-size:12px;color:var(--muted)}
+.wtop div.now{border-color:var(--gold);background:linear-gradient(180deg,var(--goldDim),transparent)}
+table.st{width:100%;border-collapse:collapse;font-size:13px}
+table.st th{text-align:left;font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.06em;padding:6px 6px;border-bottom:1px solid var(--line2);white-space:nowrap}
+table.st td{padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.st tr.q td{background:rgba(82,192,141,.06)} table.st tr.x td{opacity:.45}
+.tbl{overflow-x:auto}
+.pbar{display:inline-block;width:70px;height:6px;background:var(--bg2);border-radius:3px;overflow:hidden;vertical-align:middle;margin-right:6px}
+.pbar i{display:block;height:100%;background:var(--gold)}
+.mt{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:4px;background:var(--bg2);margin-bottom:8px}
+.mt .tm{display:flex;flex-direction:column;gap:4px;min-width:0}
+.mt .tm.r{align-items:flex-end;text-align:right}
+.mt .tm b{font-size:15px}
+.mt .mid{text-align:center;font-size:11.5px;color:var(--muted)}
+.mt .mid .num{font-size:22px;color:var(--text);display:block}
+.mt .wb{cursor:pointer;font-size:11px;padding:2px 8px;border-radius:3px;border:1px solid var(--line2);background:none;color:var(--muted)}
+.mt .wb.on{background:var(--good);color:#071;border-color:var(--good);color:#04140c;font-weight:700}
+.bracket{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:12px;min-width:680px}
+.bcol{display:flex;flex-direction:column;gap:6px}
+.bcb{flex:1;display:flex;flex-direction:column;justify-content:space-around;gap:10px}
+.bcol h4{margin:0 0 4px;font-size:11px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;text-align:center}
+.bm{border:1px solid var(--line2);border-radius:4px;background:var(--bg2);overflow:hidden}
+.bm .bt{display:flex;justify-content:space-between;gap:6px;padding:6px 8px;font-size:12.5px;border-bottom:1px solid var(--line)}
+.bm .bt:last-child{border-bottom:0}
+.bm .bt.fix b{color:var(--gold2)}
+.bm .bt span{font-family:var(--f-disp);color:var(--muted)}
+.bm .alt{font-size:10.5px;color:var(--dim);padding:0 8px 5px;margin-top:-3px}
+.champ{border:1px solid var(--gold);background:linear-gradient(180deg,var(--goldDim),transparent);padding:12px;border-radius:4px;text-align:center}
+.champ b{font-family:var(--f-disp);font-size:24px;color:var(--gold2);display:block}
+.odds{display:flex;flex-direction:column;gap:6px}
+.odds .o{display:grid;grid-template-columns:110px 1fr 54px;gap:8px;align-items:center;font-size:12.5px}
+.odds .o .ob{height:12px;background:var(--bg2);border-radius:2px;overflow:hidden}
+.odds .o .ob i{display:block;height:100%;background:linear-gradient(90deg,#8a6f3a,var(--gold))}
+.gdraft{border:1px solid var(--line);border-radius:4px;padding:10px;background:var(--bg2);margin-bottom:10px}
+.gdraft .gh{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.gdraft .gs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gdraft .gp{display:flex;flex-direction:column;gap:4px;min-width:0}
+.gdraft .gp .row span{min-width:0;overflow:hidden}
+.gdraft select{max-width:100%;font-size:11.5px;padding:2px 4px;display:block;margin-top:2px}
+.gdraft .gp .row{display:flex;align-items:center;gap:6px;font-size:12px}
+.gdraft .gp.r .row{flex-direction:row-reverse;text-align:right}
+.gdraft .bnr{display:flex;gap:3px;margin-bottom:4px;flex-wrap:wrap}
+.gdraft .gp.r .bnr{justify-content:flex-end}
+.gdraft .bnr .ct{filter:grayscale(.8) brightness(.75)}
+.ps{display:block;font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.35}
+.picks.red .pk .ps{text-align:right}
+.gc .wr{position:absolute;top:2px;left:3px;font-size:9.5px;font-family:var(--f-disp);color:var(--good);background:rgba(10,16,22,.85);padding:0 3px;border-radius:2px}
+.factors{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:10px}
+.factors .lbl{margin-right:4px}
+.ptag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.04em;color:var(--gold);border:1px solid rgba(200,170,110,.45);border-radius:3px;padding:0 5px;margin-right:7px;vertical-align:1px}
+.subh{margin:14px 0 8px;font-size:13px;display:flex;justify-content:space-between;gap:8px}
+.subh small{color:var(--muted);font-weight:500}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-top:4px}
+.rules{border:1px solid var(--line2);border-left:3px solid var(--gold);background:var(--panel);border-radius:var(--r);padding:12px 14px;font-size:13px;color:var(--muted);line-height:1.6}
+.rules b{color:var(--gold2)}
+.gp-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.gnick{display:block;font-family:var(--f-disp);font-size:28px;color:var(--gold2);letter-spacing:.03em}
+.gerr{color:var(--red);font-size:12px;min-height:18px;margin-top:6px}
+#gNick{flex:1;min-width:140px;padding:8px 10px}
+.gm{border:1px solid var(--line);border-radius:4px;background:var(--bg2);padding:10px;margin-bottom:10px}
+.gm-h{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px;margin-bottom:8px}
+.gm-h span:last-child{margin-left:auto;font-weight:600}
+.gm-b{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:stretch}
+.vsm{align-self:center;font-family:var(--f-disp);color:var(--dim);font-weight:700}
+.gpick{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 6px;border-radius:4px;border:1px solid var(--line2);background:var(--panel);cursor:pointer;position:relative}
+.gpick b{font-family:var(--f-disp);font-size:22px;letter-spacing:.04em}
+.gpick .num{font-size:15px;color:var(--muted)}
+.gpick em{font-style:normal;font-size:12px;color:var(--gold)}
+.gpick i{font-style:normal;font-size:10.5px;font-weight:700;color:#1a1408;background:var(--gold);border-radius:2px;padding:0 5px;margin-top:3px}
+.gpick:hover:not(:disabled){border-color:var(--gold)}
+.gpick.on{border-color:var(--gold);background:linear-gradient(180deg,var(--goldDim),var(--panel));box-shadow:0 0 0 1px var(--gold) inset}
+.gpick:disabled{cursor:default}
+.gpick.win{border-color:var(--good)} .gpick.lose{opacity:.55}
+.gh-row{display:grid;grid-template-columns:1.3fr 1fr 1fr 54px;gap:6px;font-size:12.5px;padding:7px 8px;border-radius:3px;margin-bottom:4px;background:var(--bg2);border-left:3px solid var(--line2)}
+.gh-row.ok{border-left-color:var(--good)} .gh-row.no{border-left-color:var(--red)}
+.gh-row b{text-align:right}
+table.st tr.me td{background:var(--goldDim)}
+footer{border-top:1px solid var(--line);padding-block:20px;color:var(--muted);font-size:12px}
+footer .wrap{display:flex;flex-direction:column;gap:6px}
+footer a{color:var(--gold)}
+
+@media (max-width:1080px){
+  .bmain{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .center{grid-column:1/-1;order:3;border:0;border-top:1px solid var(--line)}
+  .picks.red{order:2}
+  .s8,.s7,.s6,.s5,.s4{grid-column:span 12}
+}
+@media (max-width:760px){
+  .setup{grid-template-columns:1fr}
+  .lineup{grid-template-columns:repeat(2,1fr)}
+  .bh{grid-template-columns:1fr 1fr}
+  .phase{grid-column:1/-1;order:-1}
+  .bh .tn b{font-size:20px}
+  .bh .tn .wp{font-size:26px}
+  .pk{padding:8px;gap:7px;min-height:62px}
+  .pk .ct{width:36px;height:36px;font-size:13px}
+  .banslot{width:30px;height:30px}.banslot .ct{width:28px;height:28px;font-size:10px}
+  .phases,.kv{grid-template-columns:repeat(2,1fr)}
+  .comp{grid-template-columns:1fr}
+  .vgrid{grid-template-columns:1fr}
+  .wtop{grid-template-columns:repeat(2,1fr)}
+  .lane{grid-template-columns:minmax(0,1fr) 38px minmax(0,1fr) 38px minmax(0,1fr)}
+  .series{grid-template-columns:repeat(3,1fr)}
+  .stamp{margin-left:0;font-size:11px}
+  header.top{position:static}
+  .vrow{grid-template-columns:40px minmax(0,1fr)}
+  .vrow .rk{grid-column:2;margin-top:-4px}
+  .brand span{display:none}
+  .pk{min-height:64px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#worlds"><b>RIFT ORACLE</b><span>리프트 오라클 · LoL 경기 예측</span></a>
+    <nav class="tabs" aria-label="콘텐츠">
+      <a href="#worlds" data-v="worlds">리그·대회 예측</a>
+      <a href="#live" data-v="live">실시간 경기예측</a>
+      <a href="#virtual" data-v="virtual">가상 경기예측</a>
+      <a href="#game" data-v="game">승부예측 챌린지</a>
+    </nav>
+    <div class="stamp"><span>데이터 기준 <i id="stamp">2026.10.29 10:50 KST</i></span><span>패치 <i>26.20</i></span><span>피어리스 드래프트</span></div>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ============ 1. LIVE ============ -->
+<section class="view" id="v-live" hidden>
+  <div class="vhead">
+    <div>
+      <h2 class="vt">실시간 경기예측</h2>
+      <p>팀을 고르면 현재 선발 5인이 자동으로 들어갑니다. 서브가 나오면 해당 포지션에서 같은 팀 선수로 바꾸세요. 실제 중계 순서대로 밴픽을 입력하면 매 선택마다 유불리가 다시 계산됩니다.</p>
+    </div>
+    <div class="tools">
+      <label class="lbl" for="liveGame">세트</label>
+      <select id="liveGame"><option value="1">1세트</option><option value="2">2세트</option><option value="3">3세트</option><option value="4">4세트</option><option value="5">5세트</option></select>
+    </div>
+  </div>
+
+  <div class="setup">
+    <div class="card tcard" id="setupB"></div>
+    <div class="card tcard red" id="setupR"></div>
+  </div>
+
+  <div class="board" id="board">
+    <div class="bh">
+      <div class="tn"><div><b class="cb" id="bhB">BLUE</b><small id="bhBs">블루 진영</small></div><span class="wp cb num" id="wpB">50%</span></div>
+      <div class="phase"><div class="p1" id="phase1">BAN PHASE 1</div><div class="p2" id="phase2">블루 1밴</div><div class="tm num" id="timer">30</div></div>
+      <div class="tn r"><span class="wp cr num" id="wpR">50%</span><div><b class="cr" id="bhR">RED</b><small id="bhRs">레드 진영</small></div></div>
+    </div>
+    <div class="bans"><div class="bs" id="bansB"></div><div class="bs" id="bansR"></div></div>
+    <div class="bmain">
+      <div class="picks" id="picksB"></div>
+      <div class="center">
+        <div class="tools">
+          <div class="rf" id="roleFilter">
+            <button data-r="all" class="on">전체</button><button data-r="top">탑</button><button data-r="jng">정글</button><button data-r="mid">미드</button><button data-r="bot">원딜</button><button data-r="sup">서폿</button>
+          </div>
+          <input type="search" id="champSearch" placeholder="챔피언 검색 (한글/영문)" aria-label="챔피언 검색">
+        </div>
+        <div class="reco" id="reco"></div>
+        <div class="grid" id="champGrid"></div>
+        <div class="legend"><span><b class="cg">우상단 %</b> 월즈 픽·밴 관여율</span><span><b style="color:var(--good)">좌상단 %</b> 월즈 승률(공개된 챔피언)</span><span>챔피언을 길게 누르거나 올리면 상세 기록</span></div>
+        <div class="tools">
+          <button class="btn" id="bUndo">되돌리기</button>
+          <button class="btn" id="bAuto">AI로 나머지 진행</button>
+          <button class="btn" id="bSwap">진영 교체</button>
+          <button class="btn" id="bReset">초기화</button>
+          <button class="btn" id="bNext" title="이번 세트 픽을 피어리스 잠금에 넣고 다음 세트로">다음 세트 (피어리스)</button>
+          <button class="btn" id="bTimer">타이머 켜기</button>
+        </div>
+        <div class="fear" id="fearless"></div>
+        <div class="note">픽은 선수 포지션에 자동 배정됩니다. 배정이 실제와 다르면 같은 진영의 픽 칸 두 개를 차례로 눌러 서로 바꾸세요.</div>
+      </div>
+      <div class="picks red" id="picksR"></div>
+    </div>
+  </div>
+
+  <div class="deck">
+    <div class="card s8">
+      <h3>종합 승률 <small id="wpNote">밴픽 진행에 따라 실시간 갱신</small></h3>
+      <div class="wpbar"><div class="b" id="wpbB" style="width:50%">50%</div><div class="r" id="wpbR" style="width:50%">50%</div></div>
+      <div style="margin-top:14px" class="phases" id="phaseCards"></div>
+    </div>
+    <div class="card s4">
+      <h3>밴픽 흐름 <small>단계별 블루 승률</small></h3>
+      <svg class="spark" id="spark" viewBox="0 0 300 110" role="img" aria-label="밴픽 단계별 승률 변화"></svg>
+      <div class="kv" style="grid-template-columns:1fr 1fr;margin-top:8px" id="kvSmall"></div>
+    </div>
+    <div class="card s7">
+      <h3>라인별 매치업 <small>라인전 우세 확률 (블루 기준)</small></h3>
+      <div id="lanes"></div>
+    </div>
+    <div class="card s5">
+      <h3>관전 포인트</h3>
+      <div id="points"></div>
+    </div>
+    <div class="card s12">
+      <h3>밴픽 챔피언 기록 <small>월즈 2026 픽률·밴률·승률 + 선수의 이번 대회 해당 챔피언 성적</small></h3>
+      <div id="draftTable"></div>
+      <div class="note">대회 기록: 플레이인+스위스 53경기 집계(10/27). 승률은 집계처가 공개한 챔피언만 표시합니다. 선수 기록: 경기별 보도로 챔피언과 승패가 확인된 경기만 반영했고, 그 외는 ‘첫 사용’으로 표시됩니다.</div>
+    </div>
+    <div class="card s12">
+      <h3>메타 해석 · 조합 분석 <small>월즈 2026 플레이인+스위스 기록 기준</small></h3>
+      <div class="comp" id="compBox"></div>
+      <ul class="pts" id="metaNotes" style="margin-top:12px"></ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2. VIRTUAL ============ -->
+<section class="view" id="v-virtual" hidden>
+  <div class="vhead">
+    <div>
+      <h2 class="vt">가상 경기예측</h2>
+      <p>리그와 팀 구분 없이 원하는 선수 5명씩을 골라 맞붙여 봅니다. AI가 두 팀의 챔피언 폭과 현재 메타로 밴픽을 짜고, 경기를 2,000번 시뮬레이션해 결과를 냅니다.</p>
+    </div>
+    <div class="tools">
+      <button class="btn" id="vRandom">랜덤 올스타</button>
+      <button class="btn" id="vLck">LCK vs LPL 올스타</button>
+      <button class="btn pri" id="vRun">시뮬레이션 실행</button>
+    </div>
+  </div>
+  <div class="vgrid">
+    <div class="card tcard"><h3><span class="cb">A팀 (블루)</span><small id="vEloA"></small></h3><div id="vA"></div>
+      <div class="trow" style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap"><select id="vLoadA" aria-label="A팀에 팀 통째로 불러오기"></select><span class="chip g" id="vLabA"></span></div></div>
+    <div class="vs">VS</div>
+    <div class="card tcard red"><h3><span class="cr">B팀 (레드)</span><small id="vEloB"></small></h3><div id="vB"></div>
+      <div class="trow" style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap"><select id="vLoadB" aria-label="B팀에 팀 통째로 불러오기"></select><span class="chip g" id="vLabB"></span></div></div>
+  </div>
+  <div class="deck" id="vResult"></div>
+</section>
+
+<!-- ============ 3. WORLDS ============ -->
+<section class="view" id="v-worlds">
+  <div class="vhead">
+    <div>
+      <h2 class="vt">2026 월드 챔피언십 예측</h2>
+      <p>스위스 스테이지 실제 결과를 반영한 레이팅으로 남은 경기와 8강 이후 대진을 5,000번 시뮬레이션합니다. 아직 안 끝난 경기는 직접 결과를 눌러 넣으면 즉시 다시 계산됩니다.</p>
+    </div>
+    <div class="tools"><button class="btn pri" id="wRun">다시 시뮬레이션</button></div>
+  </div>
+  <div class="wtop" id="wTop"></div>
+  <div class="deck" style="margin-top:0">
+    <div class="card s7">
+      <h3>스위스 스테이지 순위 <small>3승 진출 · 3패 탈락</small></h3>
+      <div class="tbl"><table class="st" id="wStand"></table></div>
+    </div>
+    <div class="card s5">
+      <h3>남은 경기 <small>결과를 눌러 가상으로 반영</small></h3>
+      <div id="wPend"></div>
+      <div class="note" id="wR5"></div>
+    </div>
+    <div class="card s12">
+      <h3>예상 녹아웃 대진표 <small>각 자리별 가장 가능성 높은 팀과 확률</small></h3>
+      <div class="tbl"><div class="bracket" id="wBracket"></div></div>
+      <div class="note">8강 대진은 스위스 종료 후 추첨으로 정해집니다. 3전 전승 팀은 3승 2패 팀과 만나고, 두 3전 전승 팀은 서로 반대편에 놓이는 규칙을 적용했습니다(GenG를 위쪽, DK를 아래쪽에 고정).</div>
+    </div>
+    <div class="card s5">
+      <h3>우승 확률</h3>
+      <div class="odds" id="wOdds"></div>
+    </div>
+    <div class="card s7">
+      <h3>다음 경기 밴픽·결과 예상</h3>
+      <div class="tools" style="margin-bottom:10px">
+        <select id="wMatch" aria-label="경기 선택"></select>
+        <select id="wCA" aria-label="가상 대진 팀 A" hidden></select>
+        <select id="wCB" aria-label="가상 대진 팀 B" hidden></select>
+        <select id="wBo" aria-label="경기 방식"><option value="3">3판 2선승</option><option value="5">5판 3선승</option><option value="1">단판</option></select>
+        <button class="btn" id="wToLive">실시간 예측으로 열기</button>
+      </div>
+      <div id="wAnalysis"></div>
+    </div>
+  </div>
+</section>
+<!-- ============ 4. CHALLENGE ============ -->
+<section class="view" id="v-game" hidden>
+  <div class="vhead">
+    <div>
+      <h2 class="vt">승부예측 챌린지</h2>
+      <p>다음 경기의 승리 팀을 골라 내 예측 실력을 기록합니다. 맞히기 어려운 쪽을 맞힐수록 더 오르고, 틀리면 깎입니다. 경기 결과는 하루 여러 차례 자동으로 갱신됩니다.</p>
+    </div>
+  </div>
+  <div class="rules">
+    <b>무료 예측 놀이입니다.</b> 포인트는 예측 기록을 보여주는 숫자일 뿐이며 현금·상품·쿠폰·게임 재화로 바꿀 수 없고, 다른 사람에게 주거나 옮기거나 나눌 수 없습니다. 결제·참가비가 없고 무엇을 걸지도 않습니다. 점수는 베팅 사이트 배당이 아닌 이 사이트 예측 모델의 승률로 계산합니다. 적중하면 <b>100 ÷ 내가 고른 팀의 모델 승률</b>만큼 오르고(승률은 15%~90%로 제한), 실패하면 <b>상대 팀을 맞혔을 때 점수의 80%</b>(최대 400점)만큼 깎이며 0점 아래로는 내려가지 않습니다. 예측을 많이 하는 것보다 잘 맞히는 쪽이 유리하도록 만든 규칙입니다.
+  </div>
+  <div class="deck" style="margin-top:14px">
+    <div class="card s5"><h3>내 기록</h3><div id="gProfile"></div><div class="note" id="gNote"></div></div>
+    <div class="card s7"><h3>예측할 경기 <small>경기 시작 시각에 마감</small></h3><div id="gMatches"></div></div>
+    <div class="card s7"><h3>랭킹</h3>
+      <div class="rf" id="gRankTabs" style="margin-bottom:10px"><button data-k="score" class="on">누적 점수</button><button data-k="hits">누적 적중</button><button data-k="streak">연속 적중</button></div>
+      <div class="tbl" id="gRank"></div><div class="note" id="gRankNote"></div></div>
+    <div class="card s5"><h3>내 예측 결과</h3><div id="gHist"></div></div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>경기 결과·로스터: LoL Esports 공식 결과와 Leaguepedia, Liquipedia, GosuGamers, 인벤, OSEN, 스포츠경향 보도 (10/29 오전 기준). 챔피언 픽·밴 기록: 월즈 2026 플레이인+스위스 53경기 집계(lolworlds2026.com, nerfplz.com).</div>
+    <div>선수 레이팅, 챔피언 숙련도, 시간대별 승률은 2026 시즌·국제전 성적을 바탕으로 한 자체 추정 모델입니다. 실제 결과와 다를 수 있으며 베팅 용도가 아닙니다. LoL 대회 시즌 개막 로스터를 쓴 비월즈 팀은 시즌 중 변동이 있을 수 있습니다.</div>
+  </div>
+</footer>
+<script>
+// ===================== DATA =====================
+// Champion: key|ko|roles|class|early mid late|dmg|tags|meta power (patch 26.20 Worlds)
+// tags: E engage, F frontline, P poke, S scaling, D dive, Pr protect, Sp split, W teamfight AoE, Pk pick, Ln lane bully
+const CH_RAW = `
+Rumble|럼블|T,M|mage|4 4 3|AP|W,Ln|80
+Ambessa|암베사|T|fighter|4 4 3|AD|D,Sp|86
+KSante|크산테|T|tank|3 4 4|AD|F,E,Pr|74
+Olaf|올라프|T,J|fighter|5 4 2|AD|D,Ln|86
+Jayce|제이스|T,M|fighter|5 4 2|AD|P,Ln|80
+Camille|카밀|T|fighter|3 4 4|AD|D,Sp,Pk|80
+Gnar|나르|T|fighter|3 4 4|AD|F,W,E|81
+Jax|잭스|T|fighter|3 4 5|Mix|Sp,D|76
+Renekton|레넥톤|T|fighter|5 4 2|AD|D,Ln|79
+Kled|클레드|T|fighter|4 4 3|AD|E,D|78
+Irelia|이렐리아|T|fighter|4 4 3|AD|D,Sp|76
+Zaahen|자헨|T|fighter|4 4 4|AD|D,Sp|80
+Aatrox|아트록스|T|fighter|4 4 3|AD|D,F|74
+Ornn|오른|T|tank|2 4 5|AP|F,E,S|78
+Sion|사이온|T|tank|2 4 4|AD|F,E|70
+Gragas|그라가스|T,J|tank|3 4 3|AP|E,F|72
+Gwen|그웬|T|fighter|2 4 5|AP|Sp,S|70
+Yorick|요릭|T|fighter|3 4 4|AD|Sp|66
+Varus|바루스|B,T|marksman|4 4 4|Mix|P,Pk|78
+Galio|갈리오|M,S,T|tank|3 5 4|AP|E,F,Pr|80
+LeeSin|리 신|J|fighter|5 4 2|AD|Pk,D|86
+JarvanIV|자르반 4세|J|fighter|4 5 3|AD|E,D,W|85
+Qiyana|키아나|J,M|assassin|4 5 3|AD|W,Pk,D|86
+Vi|바이|J|fighter|4 4 3|AD|E,Pk,D|88
+Nocturne|녹턴|J|assassin|4 5 3|AD|E,D,Pk|91
+MonkeyKing|오공|J,T|fighter|3 4 4|AD|E,W,D|78
+Naafiri|나피리|J,M|assassin|4 4 2|AD|Pk,D|72
+Skarner|스카너|J,T|tank|3 5 4|AP|E,F,Pk|79
+XinZhao|신 짜오|J|fighter|5 4 2|AD|D,E|78
+Pantheon|판테온|J,S,M|fighter|5 3 2|AD|Pk,D,Ln|77
+Maokai|마오카이|J,S,T|tank|3 4 4|AP|E,F,Pr|76
+Sejuani|세주아니|J|tank|3 4 4|AP|E,F,W|74
+Viego|비에고|J|assassin|3 4 4|AD|D,S|74
+Trundle|트런들|J,T|fighter|4 4 3|AD|D,Sp|68
+Poppy|뽀삐|J,S|tank|3 4 3|AD|F,Pr,E|72
+Orianna|오리아나|M|mage|3 4 5|AP|W,Pr,S|85
+Syndra|신드라|M|mage|4 4 4|AP|Pk,P|87
+Akali|아칼리|M,T|assassin|3 4 4|AP|D,Pk,Sp|77
+Viktor|빅토르|M|mage|3 4 5|AP|W,S,P|82
+Locke|로크|M|assassin|4 4 3|AD|Pk,D|82
+Cassiopeia|카시오페아|M|mage|3 4 5|AP|S,W|90
+Anivia|애니비아|M|mage|3 4 5|AP|S,W,Pr|80
+Aurora|오로라|M,T|mage|4 4 3|AP|Pk,W|80
+Corki|코르키|M,B|marksman|3 4 4|Mix|P,S|78
+Taliyah|탈리야|M,J|mage|4 4 3|AP|Pk,W|78
+Azir|아지르|M|mage|2 4 5|AP|S,W,Pr|79
+Ryze|라이즈|M|mage|2 4 5|AP|S,Sp|78
+LeBlanc|르블랑|M|assassin|4 4 2|AP|Pk|74
+TwistedFate|트위스티드 페이트|M|mage|3 5 3|AP|Pk|76
+Sylas|사일러스|M|mage|3 4 4|AP|D,W|76
+Annie|애니|M,S|mage|4 4 3|AP|E,W|76
+Yone|요네|M,T|fighter|3 4 5|AD|D,W,S|76
+Ahri|아리|M|mage|3 4 3|AP|Pk|74
+Hwei|흐웨이|M|mage|3 4 4|AP|P,W|73
+Ezreal|이즈리얼|B|marksman|4 4 3|AD|P,Ln|87
+Jhin|진|B|marksman|4 4 3|AD|Pk,P|85
+Kalista|칼리스타|B|marksman|5 4 2|AD|Ln,E|85
+Lucian|루시안|B|marksman|5 4 2|AD|Ln,D|79
+Yunara|유나라|B|marksman|3 4 5|AD|S|80
+Kaisa|카이사|B|marksman|3 4 5|Mix|D,S|80
+Xayah|자야|B|marksman|3 4 4|AD|S,Pr|76
+Ashe|애쉬|B,S|marksman|3 4 4|AD|Pk,E|77
+Caitlyn|케이틀린|B|marksman|5 4 3|AD|Ln,P|78
+Aphelios|아펠리오스|B|marksman|2 4 5|AD|S,W|76
+Sivir|시비르|B|marksman|3 4 4|AD|S,W|74
+Draven|드레이븐|B|marksman|5 4 2|AD|Ln|73
+Tristana|트리스타나|B,M|marksman|3 4 4|AD|D,S|76
+Jinx|징크스|B|marksman|2 4 5|AD|S|73
+Zeri|제리|B|marksman|2 4 5|AD|S|71
+Vayne|베인|B,T|marksman|2 4 5|AD|S,Sp|72
+Smolder|스몰더|B|marksman|2 4 5|Mix|S,P|72
+Alistar|알리스타|S|tank|4 4 3|AP|E,F,Pr|78
+Nautilus|노틸러스|S|tank|4 4 3|AP|E,F,Pk|85
+Renata|레나타 글라스크|S|enchanter|3 4 4|AP|Pr,W|86
+Lulu|룰루|S|enchanter|3 4 4|AP|Pr,S|80
+Seraphine|세라핀|S,M|enchanter|3 4 4|AP|W,P,Pr|85
+Karma|카르마|S|enchanter|4 4 3|AP|P,Ln,Pr|79
+Rakan|라칸|S|catcher|3 4 4|AP|E,W|79
+Rell|렐|S|tank|3 4 4|AP|E,F,W|79
+Braum|브라움|S|tank|3 4 3|AP|F,Pr|74
+Milio|밀리오|S|enchanter|2 4 5|AP|Pr,S|76
+Bard|바드|S|catcher|3 4 4|AP|Pk,E|77
+Leona|레오나|S|tank|4 4 3|AP|E,F|75
+Neeko|니코|S,M|mage|3 4 3|AP|E,W,Pk|74
+Nami|나미|S|enchanter|4 4 3|AP|Pr,Ln|75
+Lux|럭스|S,M|mage|3 4 4|AP|P,Pk|74
+Akshan|아크샨|M,B|marksman|4 4 3|AD|Pk,Ln|66
+Amumu|아무무|J,S|tank|3 4 4|AP|E,F,W|66
+AurelionSol|아우렐리온 솔|M|mage|2 4 5|AP|S,W|68
+Belveth|벨베스|J|fighter|3 4 5|AD|D,S|65
+Blitzcrank|블리츠크랭크|S|catcher|4 4 2|AP|Pk,E|66
+Brand|브랜드|S,M|mage|4 4 3|AP|P,W|64
+Briar|브라이어|J|fighter|4 4 3|AD|D,Pk|64
+Chogath|초가스|T|tank|3 4 4|AP|F,Pk|64
+Darius|다리우스|T|fighter|5 4 3|AD|D,Ln|66
+Diana|다이애나|J,M|assassin|3 4 4|AP|E,W,D|72
+DrMundo|문도 박사|T|tank|2 4 5|AD|F,S|62
+Ekko|에코|J,M|assassin|4 4 3|AP|Pk,D|70
+Elise|엘리스|J|mage|5 3 2|AP|Pk,D|68
+Evelynn|이블린|J|assassin|3 4 3|AP|Pk|62
+Fiddlesticks|피들스틱|J|mage|3 4 4|AP|E,W|64
+Fiora|피오라|T|fighter|3 4 5|AD|Sp,S|66
+Fizz|피즈|M|assassin|3 4 3|AP|Pk,D|62
+Gangplank|갱플랭크|T|fighter|2 4 5|Mix|S,P,Sp|70
+Garen|가렌|T|fighter|4 4 3|AD|D|60
+Graves|그레이브즈|J|marksman|4 4 3|AD|D,S|70
+Hecarim|헤카림|J|fighter|4 4 3|AD|E,D|64
+Heimerdinger|하이머딩거|M,S|mage|4 3 3|AP|P,Ln|58
+Illaoi|일라오이|T|fighter|3 4 4|AD|Sp,Ln|58
+Ivern|아이번|J|enchanter|3 4 3|AP|Pr|66
+Janna|잔나|S|enchanter|3 4 4|AP|Pr|66
+Karthus|카서스|J,M|mage|2 4 5|AP|S,W|62
+Kassadin|카사딘|M|assassin|2 4 5|AP|S,D|62
+Katarina|카타리나|M|assassin|3 4 4|AP|D,W|62
+Kayle|케일|T,M|marksman|1 3 5|AP|S|60
+Kayn|케인|J|fighter|3 4 4|AD|D,Pk|66
+Kennen|케넨|T,M|mage|4 4 3|AP|E,W|70
+Khazix|카직스|J|assassin|4 4 3|AD|Pk|66
+Kindred|킨드레드|J|marksman|4 4 4|AD|Pk,S|68
+KogMaw|코그모|B|marksman|2 4 5|Mix|S|64
+Lillia|릴리아|J|mage|3 4 4|AP|W,E|68
+Lissandra|리산드라|M|mage|3 4 4|AP|E,Pk,F|72
+Malphite|말파이트|T,S|tank|3 4 4|AP|E,F,W|68
+Malzahar|말자하|M|mage|3 4 4|AP|Pk,S|66
+MasterYi|마스터 이|J|fighter|3 4 5|AD|S|58
+Mel|멜|M,S|mage|3 4 4|AP|P,Pr|72
+MissFortune|미스 포츈|B|marksman|4 4 3|AD|W,P|70
+Mordekaiser|모데카이저|T|fighter|3 4 4|AP|D|62
+Morgana|모르가나|S,J|mage|3 4 3|AP|Pr,Pk|64
+Nasus|나서스|T|fighter|2 4 5|AD|Sp,S|60
+Nidalee|니달리|J|assassin|5 3 2|AP|P,Pk|66
+Nilah|닐라|B|fighter|3 4 4|AD|D,S|62
+Nunu|누누와 윌럼프|J|tank|4 4 3|AP|E,Pk|64
+Pyke|파이크|S|assassin|4 4 2|AD|Pk,E|66
+Quinn|퀸|T|marksman|4 3 3|AD|Ln,Sp|58
+Rammus|람머스|J|tank|3 4 3|AP|E,F|60
+RekSai|렉사이|J|fighter|5 4 2|AD|D,Pk|70
+Rengar|렝가|J,T|assassin|4 4 3|AD|Pk,D|64
+Riven|리븐|T|fighter|4 4 3|AD|D,Sp|66
+Samira|사미라|B|marksman|4 4 3|AD|D,W|66
+Senna|세나|S,B|marksman|3 4 5|AD|P,S,Pr|72
+Sett|세트|T,S|fighter|4 4 3|AD|E,F|66
+Shaco|샤코|J,S|assassin|4 3 3|AD|Pk|58
+Shen|쉔|T,S|tank|3 4 4|AD|F,Pr,E|70
+Shyvana|쉬바나|J|fighter|3 4 4|Mix|S|58
+Singed|신지드|T|tank|3 4 4|AP|Sp|56
+Sona|소나|S|enchanter|2 4 5|AP|Pr,S|60
+Soraka|소라카|S|enchanter|3 4 4|AP|Pr|62
+Swain|스웨인|S,M,T|mage|3 4 4|AP|F,W|66
+TahmKench|탐 켄치|S,T|tank|4 4 3|AP|Pr,F|68
+Talon|탈론|M,J|assassin|4 4 2|AD|Pk|62
+Taric|타릭|S|tank|2 4 4|AP|Pr,E|62
+Teemo|티모|T|mage|4 3 3|AP|Ln|54
+Thresh|쓰레쉬|S|catcher|3 4 4|AP|Pk,E,Pr|74
+Tryndamere|트린다미어|T|fighter|3 4 5|AD|Sp|56
+Twitch|트위치|B,J|marksman|2 4 5|AD|S|62
+Udyr|우디르|J,T|fighter|4 4 3|Mix|D|62
+Urgot|우르곳|T|fighter|3 4 4|AD|F|60
+Veigar|베이가|M,B|mage|2 4 5|AP|S,Pk|60
+Velkoz|벨코즈|S,M|mage|3 4 4|AP|P|60
+Vex|벡스|M|mage|3 4 4|AP|E,W|66
+Vladimir|블라디미르|M,T|mage|2 4 5|AP|S,W|62
+Volibear|볼리베어|J,T|fighter|4 4 3|Mix|D,F|66
+Warwick|워윅|J,T|fighter|4 4 3|Mix|D|64
+Xerath|제라스|M,S|mage|3 4 4|AP|P|64
+Yasuo|야스오|M,T|fighter|3 4 4|AD|D,W|68
+Yuumi|유미|S|enchanter|2 4 5|AP|Pr,S|56
+Zac|자크|J,T|tank|3 4 4|AP|E,F|66
+Zed|제드|M|assassin|4 4 3|AD|Pk|62
+Ziggs|직스|B,M|mage|3 4 4|AP|P,Sp|66
+Zilean|질리언|S,M|enchanter|3 4 4|AP|Pr|64
+Zoe|조이|M|mage|3 4 3|AP|P,Pk|64
+Zyra|자이라|S|mage|4 4 3|AP|P,W|62
+`;
+const ABBR = {AurelionSol:'아솔',DrMundo:'문도',Nunu:'누누',MissFortune:'미포',TahmKench:'탐켄',MasterYi:'마이',Belveth:'벨베',KogMaw:'코그',Chogath:'초가',Khazix:'카직',RekSai:'렉사',Velkoz:'벨코',TwistedFate:'TF',JarvanIV:'자르',MonkeyKing:'오공',KSante:'크산',Renata:'레나',LeeSin:'리신',XinZhao:'신짜',Kaisa:'카이'};
+const EN_NAME = {Belveth:"Bel'Veth",Chogath:"Cho'Gath",DrMundo:'Dr. Mundo',Khazix:"Kha'Zix",KogMaw:"Kog'Maw",RekSai:"Rek'Sai",Velkoz:"Vel'Koz",Nunu:'Nunu & Willump',KSante:"K'Sante",Kaisa:"Kai'Sa",MonkeyKing:'Wukong',Renata:'Renata Glasc',LeBlanc:'LeBlanc',JarvanIV:'Jarvan IV'};
+const CLS_H = {tank:200,fighter:18,assassin:285,mage:228,marksman:42,enchanter:165,catcher:330};
+const CLS_KO = {tank:'탱커',fighter:'전사',assassin:'암살자',mage:'마법사',marksman:'원거리',enchanter:'서포터(유틸)',catcher:'서포터(이니시)'};
+const LETTER = {T:'top',J:'jng',M:'mid',B:'bot',S:'sup'};
+const CH = {}; const CH_LIST = [];
+CH_RAW.trim().split('\n').forEach(line=>{
+  const [key,ko,roles,cls,curve,dmg,tags,power]=line.split('|');
+  const c={key,ko,roles:roles.split(',').map(x=>LETTER[x]),cls,curve:curve.split(' ').map(Number),dmg,tags:tags.split(','),power:+power,
+    ab:ABBR[key]||ko.replace(/\s/g,'').slice(0,2),en:EN_NAME[key]||key.replace(/([a-z])([A-Z])/g,'$1 $2')};
+  CH[key]=c; CH_LIST.push(c);
+});
+// Worlds 2026 pick/ban record (Play-In + Swiss, 53 games, collected ~Oct 27). w = wins where reported.
+const META_GAMES = 53;
+const META = {
+  LeeSin:{p:18},Ezreal:{p:16,b:17},JarvanIV:{p:16},Rumble:{p:15},Alistar:{p:14,w:4},Ambessa:{p:14,w:8},KSante:{p:14},
+  Jhin:{p:13,w:8},Qiyana:{p:13,b:18,w:7},Orianna:{p:13,w:8},Syndra:{p:12,b:21,w:7},Nautilus:{p:12,w:8},Akali:{p:12,b:16,w:3},
+  Kalista:{p:12},Renata:{p:12,b:20},Lulu:{p:12,w:5},Vi:{p:11,b:31,w:7},Olaf:{p:10,b:24,w:6},Viktor:{p:10},Nocturne:{p:10,b:40},
+  Cassiopeia:{p:7,b:29,w:6},Locke:{p:9,b:17},Seraphine:{p:9,b:16},Jayce:{p:7,b:13},Camille:{p:5},MonkeyKing:{p:7},Lucian:{p:9},
+  Yunara:{p:9},Kaisa:{p:7},Karma:{p:8},Gnar:{p:5,w:3},Jax:{p:5,w:2},Renekton:{p:3,w:2},Caitlyn:{p:4,w:1}
+};
+
+// Teams. players: [id, role, rating, pool(optional, comma list), sub?]
+const LEAGUE_KO = {LCK:'LCK',LPL:'LPL',LEC:'LEC',LCS:'LCS',LCP:'LCP',CBLOL:'CBLOL'};
+const TEAMS_RAW = [
+ // LCK
+ ['GEN','젠지','Gen.G','LCK',1,55,1,[['Kiin','top',91,'Rumble,Camille,Ambessa,KSante,Varus,Gnar'],['Canyon','jng',94,'Nocturne,LeeSin,JarvanIV,Vi,Qiyana,Skarner'],['Chovy','mid',96,'Anivia,Akali,Galio,Orianna,Syndra,Yone,Azir'],['Ruler','bot',93,'Jhin,Kalista,Ezreal,Varus,Yunara,Ashe'],['Duro','sup',87,'Nautilus,Rell,Alistar,Rakan,Renata']]],
+ ['HLE','한화생명','Hanwha Life Esports','LCK',2,40,1,[['Zeus','top',93,'Olaf,Rumble,Jayce,Gnar,KSante,Ambessa'],['Kanavi','jng',89,'Qiyana,Vi,XinZhao,LeeSin,JarvanIV'],['Zeka','mid',89,'Akali,Sylas,Syndra,Viktor,Aurora'],['Gumayusi','bot',91,'Ezreal,Jhin,Varus,Ashe,Caitlyn,Kalista'],['Delight','sup',89,'Alistar,Rell,Nautilus,Rakan,Leona']]],
+ ['T1','T1','T1','LCK',3,55,1,[['Doran','top',88,'Ambessa,Rumble,Gnar,KSante,Renekton'],['Oner','jng',91,'LeeSin,Vi,Nocturne,JarvanIV,XinZhao'],['Faker','mid',92,'Syndra,Orianna,Cassiopeia,Locke,Galio,Azir,Ryze'],['Peyz','bot',91,'Ezreal,Kalista,Jhin,Varus,Kaisa'],['Keria','sup',95,'Alistar,Renata,Rakan,Nautilus,Lulu,Bard']]],
+ ['DK','디플러스 기아','Dplus KIA','LCK',4,58,1,[['Siwoo','top',88,'Ornn,Irelia,Jayce,Rumble,Gnar'],['Lucid','jng',90,'LeeSin,Nocturne,Vi,Qiyana'],['ShowMaker','mid',90,'Ryze,Syndra,Orianna,Galio,Taliyah'],['Smash','bot',89,'Kaisa,Ezreal,Lucian,Jhin'],['Career','sup',86,'Alistar,Renata,Nautilus,Rell']]],
+ ['KT','KT 롤스터','KT Rolster','LCK',0,40,0,[['PerfecT','top',85],['Cuzz','jng',85],['Bdd','mid',87,'Orianna,Azir,Syndra,Taliyah'],['Aiming','bot',87,'Ezreal,Kalista,Jhin'],['Effort','sup',84],['Ghost','sup',82,'',1],['Pollu','sup',80,'',1]]],
+ ['BFX','BNK 피어엑스','BNK FearX','LCK',0,42,0,[['Clear','top',83],['Raptor','jng',84],['VicLa','mid',84],['Taeyoon','bot',83],['Kellin','sup',84],['Daystar','mid',81,'',1]]],
+ ['DNS','DN 수퍼스','DN SOOPers','LCK',0,35,0,[['DuDu','top',82],['Sharvel','jng',80],['Clozer','mid',82],['deokdam','bot',84],['Peter','sup',82],['Life','sup',81,'',1]]],
+ ['BRO','한진 브리온','Hanjin BRION','LCK',0,35,0,[['Casting','top',79],['GIDEON','jng',80],['Fisher','mid',80],['Teddy','bot',82],['Namgung','sup',78]]],
+ ['KRX','키움 DRX','Kiwoom DRX','LCK',0,32,0,[['Rich','top',80],['Vincenzo','jng',79],['Ucal','mid',79],['Jiwoo','bot',81],['Andil','sup',78],['Willer','jng',78,'',1]]],
+ // LPL
+ ['BLG','빌리빌리 게이밍','Bilibili Gaming','LPL',2,40,1,[['bin','top',91,'Jax,Gnar,Ambessa,Renekton,Rumble'],['XUN','jng',88,'Vi,Qiyana,JarvanIV,XinZhao'],['Knight','mid',93,'Akali,Taliyah,Syndra,Orianna,Sylas,Ahri'],['Viper','bot',92,'Kalista,Kaisa,Ezreal,Jhin,Yunara'],['ON','sup',89,'Rakan,Alistar,Nautilus,Rell']]],
+ ['AL',"애니원즈 레전드","Anyone's Legend",'LPL',1,25,1,[['Breathe','top',86,'Rumble,Gnar,KSante'],['Tarzan','jng',89,'LeeSin,Nocturne,Viego,Skarner'],['Shanks','mid',87,'Syndra,Orianna,Akali'],['hope','bot',87,'Ezreal,Jhin,Kalista'],['Kael','sup',86,'Renata,Nautilus,Rakan']]],
+ ['TES','탑 이스포츠','Top Esports','LPL',3,42,1,[['369','top',87,'Rumble,Ambessa,KSante,Gnar,Renekton'],['Tian','jng',87,'JarvanIV,Vi,XinZhao,Qiyana'],['Creme','mid',88,'Orianna,Taliyah,Syndra,Aurora'],['JackeyLove','bot',89,'Kalista,Draven,Ezreal,Kaisa,Jhin'],['Zhuo','sup',86,'Alistar,Nautilus,Rell,Rakan'],['ZUIAN','top',86,'Jax,Aatrox,Rumble',1]]],
+ ['IG','인빅터스 게이밍','Invictus Gaming','LPL',4,52,1,[['TheShy','top',88,'Kled,Zaahen,Ornn,Jayce,Renekton'],['Wei','jng',88,'LeeSin,JarvanIV,XinZhao,Vi'],['Rookie','mid',89,'Aurora,Orianna,Annie,Corki,Syndra'],['JiaQi','bot',87,'Yunara,Caitlyn,Ezreal,Jhin'],['meiko','sup',87,'Nautilus,Lux,Alistar,Renata']]],
+ ['JDG','징동 게이밍','JD Gaming','LPL',0,35,0,[['Xiaoxu','top',84],['JunJia','jng',84],['HongQ','mid',85],['GALA','bot',87,'Kaisa,Ezreal,Kalista'],['Vampire','sup',83]]],
+ ['WBG','웨이보 게이밍','Weibo Gaming','LPL',0,35,0,[['Zika','top',84],['Jiejie','jng',84],['Xiaohu','mid',85,'Azir,Orianna,Syndra'],['Elk','bot',87],['Erha','sup',82]]],
+ ['LNG','LNG 이스포츠','LNG Esports','LPL',0,32,0,[['sheer','top',82],['Croco','jng',84],['BullDoG','mid',82],['1xn','bot',83],['Missing','sup',84]]],
+ ['WE','팀 WE','Team WE','LPL',0,32,0,[['Cube','top',81],['Monki','jng',82],['Karis','mid',82],['About','bot',82],['yaoyao','sup',81]]],
+ // LEC
+ ['G2','G2 e스포츠','G2 Esports','LEC',1,40,1,[['BrokenBlade','top',86,'KSante,Rumble,Ambessa,Gnar'],['SkewMond','jng',85,'Vi,JarvanIV,Nocturne'],['Caps','mid',89,'Orianna,Sylas,Aurora,LeBlanc,Akali'],['Hans Sama','bot',87,'Ezreal,Kalista,Draven,Jhin'],['Labrov','sup',84,'Rell,Rakan,Nautilus,Alistar']]],
+ ['MKOI','모비스타 코이','Movistar KOI','LEC',2,45,1,[['Myrwn','top',83,'Jayce,Gnar,Rumble'],['Elyoya','jng',85,'Vi,LeeSin,JarvanIV'],['jojopyun','mid',85,'Akali,Sylas,Qiyana,LeBlanc'],['Supa','bot',86,'Kaisa,Ezreal,Varus'],['Alvaro','sup',83,'Alistar,Nautilus,Leona,Rell']]],
+ ['KC','카르민 코프','Karmine Corp','LEC',3,40,1,[['Canna','top',86,'Jax,KSante,Rumble,Renekton'],['Yike','jng',84,'Vi,Skarner,JarvanIV'],['Kyeahoo','mid',84,'Syndra,Viktor,Orianna'],['Caliste','bot',87,'Ezreal,Kalista,Yunara,Kaisa'],['Busio','sup',83,'Renata,Alistar,Nautilus']]],
+ // LCS
+ ['TL','팀 리퀴드','Team Liquid Alienware','LCS',1,35,1,[['Morgan','top',81,'KSante,Rumble,Ornn'],['Josedeodo','jng',81,'JarvanIV,Vi,LeeSin'],['Quid','mid',84,'Syndra,Orianna,Akali'],['Yeon','bot',82,'Ezreal,Jhin,Kalista'],['CoreJJ','sup',84,'Renata,Alistar,Rakan']]],
+ ['LYON','라이언','LYON','LCS',2,50,1,[['Dhokla','top',81,'Olaf,Rumble,KSante'],['Inspired','jng',87,'Nocturne,LeeSin,Vi'],['Saint','mid',82,'Tristana,Sylas,Syndra'],['Berserker','bot',87,'Ezreal,Lucian,Kalista,Zeri'],['Isles','sup',82,'Milio,Karma,Nautilus']]],
+ ['C9','클라우드9','Cloud9 KIA','LCS',3,35,2,[['Thanatos','top',81],['Blaber','jng',81],['Loki','mid',80],['Tactical','bot',81],['Vulcan','sup',81]]],
+ // LCP
+ ['TSW','팀 시크릿 웨일스','Team Secret Whales','LCP',1,35,1,[['Pun','top',78],['Hizto','jng',78],['Dire','mid',77],['Eddie','bot',79],['Bie','sup',77]]],
+ ['CFO','CTBC 플라잉 오이스터','CTBC Flying Oyster','LCP',2,40,1,[['Rest','top',80,'Rumble,Gnar'],['Shad0w','jng',82,'JarvanIV,Vi'],['Pout','mid',82,'Orianna,Syndra'],['Doggo','bot',84,'Ezreal,Kalista,Jhin'],['Kino','sup',81,'Renata,Nautilus']]],
+ ['MVK','MVK e스포츠','MVK Esports','LCP',3,30,2,[['Kratos','top',75],['Gury','jng',76],['Chika','mid',75],['Harky','bot',76],['SiuLoong','sup',74]]],
+ // CBLOL
+ ['LOS','로스','LØS','CBLOL',1,40,1,[['ZEST','top',78],['Curse','jng',77],['Feisty','mid',80],['Duduhh','bot',79],['Ackerman','sup',77]]],
+ ['FUR','퓨리아','FURIA','CBLOL',2,35,2,[['Guigo','top',76],['Tatu','jng',76],['Tutsz','mid',77],['Ayu','bot',77],['Jojo','sup',75]]],
+];
+// worlds flag: 1 = main event, 2 = play-in (eliminated)
+const REGION = {LCK:'KR',LPL:'CN',LEC:'EU',LCS:'NA',LCP:'AP',CBLOL:'BR'};
+
+// ==== LIVE DATA START ====
+// Updated by the scheduled results refresh. Everything the site needs to reflect new results lives in this block.
+const DATA_STAMP = '2026.10.29 10:50 KST';
+// Worlds 2026 Swiss results [winner, loser, winnerGames, loserGames, round]
+const SWISS = [
+ ['GEN','IG',1,0,1],['HLE','TES',1,0,1],['MKOI','BLG',1,0,1],['KC','AL',1,0,1],['DK','G2',1,0,1],['CFO','TL',1,0,1],['T1','LOS',1,0,1],['LYON','TSW',1,0,1],
+ ['DK','T1',1,0,2],['MKOI','CFO',1,0,2],['GEN','HLE',1,0,2],['LYON','KC',1,0,2],['G2','LOS',1,0,2],['IG','TSW',1,0,2],['TES','AL',1,0,2],['BLG','TL',1,0,2],
+ ['DK','MKOI',2,0,3],['GEN','LYON',2,1,3],['IG','HLE',1,0,3],['TES','G2',1,0,3],['T1','CFO',1,0,3],['BLG','KC',1,0,3],['LOS','TSW',2,0,3],['TL','AL',2,0,3],
+ ['T1','MKOI',2,0,4],['IG','LYON',2,1,4],
+];
+const PENDING = [
+ {id:'r4a',a:'CFO',b:'KC',bo:3,time:'10/30(금) 05:00',stake:'패자 탈락'},
+ {id:'r4b',a:'BLG',b:'TES',bo:3,time:'10/30(금) 08:00',stake:'승자 8강 진출'},
+ {id:'r4c',a:'TL',b:'LOS',bo:3,time:'10/31(토) 05:00',stake:'패자 탈락'},
+ {id:'r4d',a:'G2',b:'HLE',bo:3,time:'10/31(토) 08:00',stake:'패자 탈락'},
+];
+const SCHEDULE = [
+ {t:'스위스 4라운드',d:'10/29–10/31 KST',s:'진행 중 · T1, IG 8강 확정',now:1},
+ {t:'스위스 5라운드',d:'11/1(일) KST 예정',s:'2승 2패 6팀, 3판 2선승'},
+ {t:'8강 · 4강',d:'11/3–11/8 (현지)',s:'미국 앨런, 5판 3선승'},
+ {t:'결승',d:'11/14 (현지)',s:'브루클린 바클레이스 센터'},
+];
+// Prediction-challenge matches (keep finished ones so their picks stay scored). start = ISO UTC.
+const GAME_MATCHES = [
+ {id:'r4a',a:'CFO',b:'KC',bo:3,start:'2026-10-29T20:00:00Z',label:'스위스 4R · 패자 탈락'},
+ {id:'r4b',a:'BLG',b:'TES',bo:3,start:'2026-10-29T23:00:00Z',label:'스위스 4R · 승자 8강'},
+ {id:'r4c',a:'TL',b:'LOS',bo:3,start:'2026-10-30T20:00:00Z',label:'스위스 4R · 패자 탈락'},
+ {id:'r4d',a:'G2',b:'HLE',bo:3,start:'2026-10-30T23:00:00Z',label:'스위스 4R · 패자 탈락'},
+];
+// Official results for GAME_MATCHES: id -> {w: winning team id, s: 'winner-loser games'}
+const OFFICIAL = {};
+// Knockout stage. QF_DRAW: null until the real quarterfinal draw is known, then [[a,b],[c,d],[e,f],[g,h]]
+// in bracket order (QF1+QF2 winners meet in SF1, QF3+QF4 in SF2). KO_RESULTS: 'qf1'..'qf4','sf1','sf2','f' -> winner id.
+const QF_DRAW = null;
+const KO_RESULTS = {};
+// ==== LIVE DATA END ====
+
+// Short team names used everywhere in the UI
+const TEAM_AB = {GEN:'GenG',HLE:'HLE',T1:'T1',DK:'DK',KT:'KT',BFX:'BFX',DNS:'DNS',BRO:'BRO',KRX:'DRX',
+  BLG:'BLG',AL:'AL',TES:'TES',IG:'IG',JDG:'JDG',WBG:'WBG',LNG:'LNG',WE:'WE',G2:'G2',MKOI:'MKOI',KC:'KC',
+  TL:'TL',LYON:'LYON',C9:'C9',TSW:'TSW',CFO:'CFO',MVK:'MVK',LOS:'LOS',FUR:'FURIA'};
+
+// Player x champion results at Worlds 2026, from game-by-game match reports (Inven, OSEN, 게임뷰, 스포츠경향, 쿠키뉴스).
+// Only games whose champion and result were both reported. [wins, losses]
+const PCHAMP = {
+ 'T1:Faker':{Syndra:[1,0]},'T1:Oner':{LeeSin:[1,0]},'T1:Doran':{Ambessa:[1,0]},
+ 'MKOI:jojopyun':{Akali:[0,1]},'MKOI:Supa':{Kaisa:[0,1],Ezreal:[1,0]},'MKOI:Alvaro':{Alistar:[0,1]},
+ 'MKOI:Myrwn':{Jayce:[0,1],Gnar:[0,1]},'MKOI:Elyoya':{Vi:[0,1]},
+ 'DK:Lucid':{LeeSin:[1,0]},'DK:Siwoo':{Ornn:[1,0],Irelia:[1,0]},'DK:Smash':{Kaisa:[1,0]},
+ 'GEN:Chovy':{Anivia:[1,0]},'GEN:Ruler':{Jhin:[1,0]},'GEN:Kiin':{Rumble:[1,0],Camille:[1,0]},
+ 'LYON:Dhokla':{Olaf:[1,1]},'LYON:Inspired':{Nocturne:[0,1]},'LYON:Saint':{Sylas:[0,1]},'LYON:Berserker':{Ezreal:[1,1]},'LYON:Isles':{Karma:[0,1]},
+ 'IG:TheShy':{Ornn:[1,0],Zaahen:[0,1],Kled:[1,0]},'IG:JiaQi':{Yunara:[1,0],Jhin:[0,1],Caitlyn:[1,0]},
+ 'IG:Rookie':{Aurora:[1,0],Corki:[0,1],Orianna:[1,0],Annie:[1,0]},'IG:Wei':{LeeSin:[0,1]},'IG:meiko':{Nautilus:[0,1],Lux:[1,0]},
+ 'HLE:Zeus':{Olaf:[0,1]},'KC:Canna':{Jax:[1,0]}
+};
+// ===================== MODEL =====================
+const ROLES=['top','jng','mid','bot','sup'];
+const ROLE_KO={top:'탑',jng:'정글',mid:'미드',bot:'원딜',sup:'서폿'};
+const RW={top:.18,jng:.22,mid:.24,bot:.21,sup:.15};
+const RW_E={top:.2,jng:.26,mid:.2,bot:.2,sup:.14};
+const SEQ=[
+ {s:'B',t:'ban'},{s:'R',t:'ban'},{s:'B',t:'ban'},{s:'R',t:'ban'},{s:'B',t:'ban'},{s:'R',t:'ban'},
+ {s:'B',t:'pick'},{s:'R',t:'pick'},{s:'R',t:'pick'},{s:'B',t:'pick'},{s:'B',t:'pick'},{s:'R',t:'pick'},
+ {s:'R',t:'ban'},{s:'B',t:'ban'},{s:'R',t:'ban'},{s:'B',t:'ban'},
+ {s:'R',t:'pick'},{s:'B',t:'pick'},{s:'B',t:'pick'},{s:'R',t:'pick'}
+];
+const SYN=[
+ ['Orianna','JarvanIV',14,'오리아나+자르반 4세: 공을 붙여 진입하는 광역 한타'],
+ ['Orianna','Nocturne',12,'녹턴 궁극기에 오리아나 공을 실어 보내는 기습 연계'],
+ ['Orianna','Vi',10,'바이 궁극기 진입에 오리아나 충격파 연계'],
+ ['Galio','Nocturne',12,'녹턴 궁 + 갈리오 궁으로 사이드 동시 합류'],
+ ['Rumble','Orianna',10,'럼블 궁극기 장판과 오리아나 충격파의 광역 연계'],
+ ['Rumble','JarvanIV',8,'자르반 궁 가두기 위에 럼블 장판'],
+ ['Kalista','Alistar',10,'칼리스타 궁으로 알리스타를 던지는 진입'],
+ ['Kalista','Nautilus',8,'칼리스타 궁 + 노틸러스 진입'],
+ ['Xayah','Rakan',14,'자야-라칸 전용 연계'],
+ ['Lulu','Kaisa',8,'룰루 보호를 받은 카이사 진입'],
+ ['Lulu','Yunara',8,'룰루 보호로 유나라 후반 캐리 극대화'],
+ ['Milio','Yunara',6,'밀리오 사거리 증가로 유나라 안정성 확보'],
+ ['Ezreal','Karma',8,'이즈리얼-카르마 라인전 견제력'],
+ ['Caitlyn','Lux',8,'케이틀린-럭스 긴 사거리로 바텀 압박'],
+ ['Jhin','Nautilus',6,'노틸러스 속박에 진 원거리 연계'],
+ ['Ashe','Galio',6,'애쉬 화살 적중 후 갈리오 진입']
+];
+const ARCH_KO={engage:'한타 이니시',poke:'포킹·견제',dive:'돌진',pick:'끊어먹기(픽)',protect:'보호·후반 캐리',split:'스플릿 운영'};
+const ARCH_DESC={
+ engage:'확실한 진입기로 오브젝트 앞 5:5 한타를 여는 조합',
+ poke:'긴 사거리로 체력을 깎은 뒤 오브젝트를 가져가는 조합',
+ dive:'후방 딜러에게 바로 달려드는 조합',
+ pick:'시야 싸움에서 한 명을 끊고 숫자 우위로 굴리는 조합',
+ protect:'캐리 한 명을 지키며 후반을 보는 조합',
+ split:'사이드 라인 압박으로 상대를 갈라 놓는 조합'
+};
+const BEATS={engage:['poke','split'],poke:['protect','dive'],protect:['dive','pick'],dive:['split','poke'],pick:['split','engage'],split:['protect','engage']};
+const TAG_KO={E:'이니시',F:'앞라인',P:'포킹',S:'후반',D:'돌진',Pr:'보호',Sp:'스플릿',W:'광역',Pk:'픽',Ln:'라인전'};
+
+function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function mulberry(seed){let a=seed>>>0;return()=>{a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const logistic=x=>1/(1+Math.pow(10,-x/400));
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const pct=x=>Math.round(x*100);
+
+// ---- build teams/players
+const TEAMS={},PLAYERS={},TEAM_ORDER=[];
+function autoPool(name,role){const rnd=mulberry(hash(name));
+  return CH_LIST.filter(c=>c.roles.includes(role)).map(c=>({k:c.key,s:c.power+(c.roles[0]===role?4:0)+rnd()*14})).sort((a,b)=>b.s-a.s).slice(0,4).map(x=>x.k)}
+TEAMS_RAW.forEach(([id,ko,en,league,seed,syn,worlds,pl])=>{
+  const t={id,ko,en,ab:TEAM_AB[id]||id,league,seed,syn,worlds,region:REGION[league],players:[],starters:{}};
+  pl.forEach(([name,role,r,pool,sub])=>{
+    const pid=id+':'+name;
+    const p={pid,name,team:id,role,r,sub:!!sub,pool:pool?pool.split(','):autoPool(name,role),verified:!!pool};
+    PLAYERS[pid]=p;t.players.push(p);
+    if(!sub&&!t.starters[role])t.starters[role]=pid;
+  });
+  TEAMS[id]=t;TEAM_ORDER.push(id);
+});
+const defaultLineup=tid=>ROLES.map(r=>TEAMS[tid].starters[r]);
+
+// ---- ratings
+function lineupRating(pids){let s=0;ROLES.forEach((r,i)=>{const p=PLAYERS[pids[i]];s+=RW[r]*((p.r-(p.role===r?0:9))-80)});return s*25}
+let FORM={};
+function synergy(pids){const cnt={};pids.forEach(pid=>{const t=PLAYERS[pid].team;cnt[t]=(cnt[t]||0)+1});
+  let best=null,m=0;for(const t in cnt)if(cnt[t]>m){m=cnt[t];best=t}
+  return{team:best,share:m,syn:TEAMS[best].syn*(m/5)**2,form:m>=4?(FORM[best]||0)*(m/5):0}}
+function lineupElo(pids){const s=synergy(pids);return 1500+lineupRating(pids)+s.syn+s.form}
+function preElo(tid){const d=defaultLineup(tid);return 1500+lineupRating(d)+TEAMS[tid].syn}
+function teamElo(tid){return preElo(tid)+(FORM[tid]||0)}
+function computeForm(extra){
+  FORM={};const E={};TEAM_ORDER.forEach(t=>E[t]=preElo(t));
+  const games=[...SWISS,...(extra||[])];
+  games.forEach(([w,l,wg,lg])=>{
+    const seq=[];for(let i=0;i<lg;i++)seq.push(0);for(let i=0;i<wg;i++)seq.push(1);
+    seq.forEach(x=>{const ew=logistic(E[w]-E[l]);const K=18;const d=K*((x?1:0)-ew);E[w]+=d;E[l]-=d});
+  });
+  TEAM_ORDER.forEach(t=>FORM[t]=E[t]-preElo(t));
+}
+computeForm();
+
+// ---- champion fit
+function champDelta(p,key,role){const c=CH[key];let d=(c.power-75)*0.35;
+  if(!c.roles.includes(role))d-=7;
+  const i=p.pool.indexOf(key);d+=i>=0?Math.max(2.5,5.5-i*0.6):-1.5;
+  if(p.role!==role)d-=1;return d}
+const NEUTRAL=3.4;
+function presence(key){const m=META[key];if(!m)return 0;return((m.p||0)+(m.b||0))/META_GAMES}
+
+// ---- composition
+function compOf(keys){
+  const ks=keys.filter(Boolean),cs=ks.map(k=>CH[k]),n=cs.length;
+  const o={n,ap:0,ad:0,front:0,cnt:{},curve:[3,3,3],score:0,arch:null,archKo:'',notes:[],syn:[],A:{}};
+  if(!n)return o;
+  const cv=[0,0,0];
+  cs.forEach(c=>{if(c.dmg==='AP')o.ap++;else if(c.dmg==='AD')o.ad++;else{o.ap+=.5;o.ad+=.5}
+    if(c.cls==='tank'||c.tags.includes('F'))o.front++;
+    c.tags.forEach(t=>o.cnt[t]=(o.cnt[t]||0)+1);c.curve.forEach((v,i)=>cv[i]+=v)});
+  o.curve=cv.map(v=>(v+(5-n)*3)/5);
+  const g=t=>o.cnt[t]||0;
+  o.A={engage:g('E')*1.2+g('W')*.8+g('F')*.4,poke:g('P')*1.4,dive:g('D')*1.1,pick:g('Pk')*1.1,protect:g('Pr')*1.0+g('S')*.8,split:g('Sp')*1.3};
+  o.arch=Object.entries(o.A).sort((a,b)=>b[1]-a[1])[0][0];o.archKo=ARCH_KO[o.arch];
+  let sc=0;const apS=o.ap/n;
+  if(n>=3){if(apS<.12||apS>.88){sc-=50;o.notes.push(apS<.5?'AD 일변도 — 상대가 방어력만 올리면 된다':'AP 일변도 — 마법 저항 아이템에 취약')}
+    else if(apS<.22||apS>.78){sc-=22;o.notes.push(apS<.5?'AD 비중이 높다':'AP 비중이 높다')}}
+  if(n>=4){if(o.front===0){sc-=35;o.notes.push('앞라인이 없어 한타 시작점이 불안')}else if(o.front===1)sc-=8;
+    if(g('E')===0){sc-=25;o.notes.push('먼저 싸움을 걸 이니시 수단이 부족')}}
+  SYN.forEach(([a,b,v,t])=>{if(ks.includes(a)&&ks.includes(b)){sc+=v;o.syn.push(t)}});
+  o.score=sc;return o}
+function compInteract(A,B){if(A.n<4||B.n<4)return 0;if(BEATS[A.arch].includes(B.arch))return 12;if(BEATS[B.arch].includes(A.arch))return -12;return 0}
+
+// ---- lane
+function laneDiff(pA,cA,pB,cB,role){
+  let d=(pA.r-(pA.role===role?0:9))-(pB.r-(pB.role===role?0:9));
+  const side=(p,c,oc)=>{if(!c)return NEUTRAL*0.8+3*1.2;const ch=CH[c];let v=champDelta(p,c,role)*0.8+ch.curve[0]*1.2+(ch.tags.includes('Ln')?1.5:0);
+    if(oc){const o=CH[oc];
+      if(role==='top'&&(ch.tags.includes('P')||ch.cls==='marksman'||c==='Rumble')&&(o.cls==='fighter'||o.cls==='tank')&&!o.tags.includes('P'))v+=1.5;
+      if(role==='mid'&&(ch.cls==='assassin')&&o.cls==='mage'&&o.tags.includes('S'))v+=1;}
+    return v};
+  d+=side(pA,cA,cB)-side(pB,cB,cA);return d}
+
+// ---- full evaluation. sides: {pids:[5], picks:{role:key}}
+function evaluate(A,B){
+  const pa=A.pids.map(id=>PLAYERS[id]),pb=B.pids.map(id=>PLAYERS[id]);
+  const eA=lineupElo(A.pids),eB=lineupElo(B.pids),base=eA-eB;
+  let dA=0,dB=0;
+  ROLES.forEach((r,i)=>{dA+=RW[r]*(A.picks[r]?champDelta(pa[i],A.picks[r],r):NEUTRAL);dB+=RW[r]*(B.picks[r]?champDelta(pb[i],B.picks[r],r):NEUTRAL)});
+  const draft=(dA-dB)*18;
+  const kA=ROLES.map(r=>A.picks[r]),kB=ROLES.map(r=>B.picks[r]);
+  const cA=compOf(kA),cB=compOf(kB);
+  const inter=compInteract(cA,cB);
+  const compD=cA.score-cB.score+inter;
+  const lanes=ROLES.map((r,i)=>{const d=laneDiff(pa[i],A.picks[r],pb[i],B.picks[r],r);return{role:r,d,p:1/(1+Math.exp(-d/8)),a:pa[i],b:pb[i],ca:A.picks[r],cb:B.picks[r]}});
+  let laneSum=0;lanes.forEach(l=>laneSum+=RW_E[l.role]*l.d);
+  const total=base+draft+compD;
+  const gA=t=>cA.cnt[t]||0,gB=t=>cB.cnt[t]||0;
+  const cd=[0,1,2].map(i=>cA.curve[i]-cB.curve[i]);
+  const eE=base*0.5+laneSum*14+cd[0]*70+compD*0.3;
+  const eM=base*0.8+draft*0.8+cd[1]*70+((gA('E')+gA('W'))-(gB('E')+gB('W')))*7+compD*0.8;
+  const eL=base*0.9+draft*0.7+cd[2]*80+(gA('S')-gB('S'))*10+compD;
+  const avgE=(cA.curve[0]+cB.curve[0])/2,avgL=(cA.curve[2]+cB.curve[2])/2;
+  const gold15=clamp(Math.round(eE*5.5/50)*50,-4000,4000);
+  const time=clamp(31+(avgL-3)*4-(avgE-3)*3-Math.abs(total)/80,24,40);
+  return{base,draft,compD,inter,total,p:logistic(total),pE:logistic(eE),pM:logistic(eM),pL:logistic(eL),eE,eM,eL,
+    lanes,cA,cB,gold15,time,firstDrag:logistic(eE*0.8+(lanes[1].d+lanes[3].d+lanes[4].d)*4),eloA:eA,eloB:eB,dA,dB}
+}
+
+// ---- role assignment
+function bestRole(pids,picks,key){let best=null,bv=-1e9;
+  ROLES.forEach((r,i)=>{if(picks[r])return;const v=champDelta(PLAYERS[pids[i]],key,r)+(CH[key].roles[0]===r?1.5:0);if(v>bv){bv=v;best=r}});return best}
+function perms(a){if(a.length<=1)return[a];const out=[];a.forEach((x,i)=>perms([...a.slice(0,i),...a.slice(i+1)]).forEach(p=>out.push([x,...p])));return out}
+const PERMS=perms(ROLES);
+function reassign(pids,keys){ // keys: list of champs -> best mapping role->key
+  const n=keys.length;if(!n)return{};
+  let best=null,bv=-1e9;
+  PERMS.forEach(pr=>{let v=0;for(let i=0;i<n;i++){const r=pr[i];v+=champDelta(PLAYERS[pids[ROLES.indexOf(r)]],keys[i],r)+(CH[keys[i]].roles[0]===r?1.5:0)}if(v>bv){bv=v;best=pr}});
+  const m={};for(let i=0;i<n;i++)m[best[i]]=keys[i];return m}
+
+// ---- AI draft
+function teamValue(pids,picks,key){let bv=-1e9;
+  ROLES.forEach((r,i)=>{if(picks[r])return;const v=champDelta(PLAYERS[pids[i]],key,r)*(0.6+RW[r]*2);if(v>bv)bv=v});
+  if(bv<-1e8)return bv;
+  const ks=ROLES.map(r=>picks[r]).filter(Boolean);
+  const before=compOf(ks).score,after=compOf([...ks,key]).score;
+  return bv+(after-before)*0.05}
+function aiStep(st,step,pidsB,pidsR,locked,rnd){
+  const side=step.s,opp=side==='B'?'R':'B';const P={B:pidsB,R:pidsR};
+  const used=new Set([...st.bans.B,...st.bans.R,...Object.values(st.picks.B),...Object.values(st.picks.R)]);
+  const avail=CH_LIST.filter(c=>!used.has(c.key)&&!locked.has(c.key));
+  let best=null,bv=-1e9;
+  avail.forEach(c=>{let v;
+    if(step.t==='ban'){const th=teamValue(P[opp],st.picks[opp],c.key);if(th<-1e8)return;v=th+presence(c.key)*6+rnd()*1.4}
+    else{const own=teamValue(P[side],st.picks[side],c.key);if(own<-1e8)return;const den=teamValue(P[opp],st.picks[opp],c.key);v=own+(den>-1e8?den*0.25:0)+rnd()*1.0}
+    if(v>bv){bv=v;best=c.key}});
+  return best}
+function applyStep(st,step,key,pidsB,pidsR,auto){
+  if(step.t==='ban'){st.bans[step.s].push(key);return}
+  const pids=step.s==='B'?pidsB:pidsR;const picks=st.picks[step.s];
+  if(auto){const keys=[...Object.values(picks),key];st.picks[step.s]=reassign(pids,keys)}
+  else{const r=bestRole(pids,picks,key);if(r)picks[r]=key}}
+function aiDraft(pidsB,pidsR,locked,seed){
+  const st={bans:{B:[],R:[]},picks:{B:{},R:{}}};const rnd=mulberry(seed||7);
+  SEQ.forEach(step=>{const k=aiStep(st,step,pidsB,pidsR,locked,rnd);if(k)applyStep(st,step,k,pidsB,pidsR,true)});
+  return st}
+
+// ---- series math
+function seriesDist(ps){ // ps: per-game win prob for A (length = bo). returns {pA, scores:[[a,b,prob]]}
+  const need=Math.ceil(ps.length/2);const out={};
+  function rec(i,a,b,pr){if(a===need||b===need){const k=a+'-'+b;out[k]=(out[k]||0)+pr;return}rec(i+1,a+1,b,pr*ps[i]);rec(i+1,a,b+1,pr*(1-ps[i]))}
+  rec(0,0,0,1);let pA=0;Object.entries(out).forEach(([k,v])=>{const[a,b]=k.split('-').map(Number);if(a>b)pA+=v});
+  return{pA,scores:Object.entries(out).sort((x,y)=>{const[a1,b1]=x[0].split('-').map(Number),[a2,b2]=y[0].split('-').map(Number);return(b1-a1)-(b2-a2)})}}
+function pSeries(p,bo){if(bo===1)return p;const pe=0.5+(p-0.5)*0.95;return seriesDist(Array(bo).fill(pe)).pA}
+const pGame=(a,b)=>logistic(teamElo(a)-teamElo(b));
+
+// ---- game simulation (virtual mode)
+function simGame(ev,rnd,log){
+  let gd=0,t=0,kA=0,kB=0,dA=0,dB=0,winner=null,fb=null,baronA=0,baronB=0,towA=0,towB=0;
+  const ev_=[],gold=[0];const L=(m,s,txt)=>{if(log)ev_.push({m,s,txt})};
+  const g15=ev.gold15,driftM=ev.eM*0.5,pL=ev.eL*0.25;ev={...ev,eE:ev.eE*0.3,eM:ev.eM*0.3};
+  const nextDrag=[5,10.5,16,21.5,27,32.5,38];let di=0;
+  for(t=1;t<=55;t++){
+    // drift
+    if(t<=14)gd+=g15/14+(rnd()-0.5)*2*380;else if(t<=25)gd+=driftM+(rnd()-0.5)*2*480;else gd+=(rnd()-0.5)*2*350;
+    // skirmish kills
+    const kr=t<3?0.12:t<=14?0.42:0.55;
+    if(rnd()<kr){const pa=logistic((t<=14?ev.eE:ev.eM)+gd/28);const s=rnd()<pa?'A':'B';if(s==='A'){kA++;gd+=300}else{kB++;gd-=300}
+      if(!fb){fb=s;L(t,s,'퍼스트 블러드')}}
+    // voidgrubs / herald
+    if(t===6){const s=rnd()<logistic(ev.eE+gd/30)?'A':'B';L(t,s,'공허 유충 획득');gd+=s==='A'?250:-250}
+    if(t===15){const s=rnd()<logistic(ev.eE+gd/30)?'A':'B';L(t,s,'전령 획득 · 포탑 압박');gd+=s==='A'?450:-450;if(s==='A')towA++;else towB++}
+    // dragons
+    if(di<nextDrag.length&&t>=nextDrag[di]&&dA<4&&dB<4){const ph=t<=14?ev.eE:t<=25?ev.eM:pL;const s=rnd()<logistic(ph+gd/32)?'A':'B';
+      if(s==='A')dA++;else dB++;di++;const cnt=s==='A'?dA:dB;gd+=s==='A'?200:-200;
+      L(t,s,cnt===4?'드래곤 영혼 획득':`드래곤 ${cnt}스택`)}
+    // mid-game teamfights
+    if(t>14&&t<=25&&rnd()<0.22){const pa=logistic(ev.eM+gd/26);const s=rnd()<pa?'A':'B';const k1=3+Math.floor(rnd()*3),k2=Math.floor(rnd()*3);
+      if(s==='A'){kA+=k1;kB+=k2;gd+=900+rnd()*500;towA++}else{kB+=k1;kA+=k2;gd-=900+rnd()*500;towB++}
+      L(t,s,`한타 승리 (${k1}:${k2}) · 포탑 철거`)}
+    // late fights
+    if(t>=24&&rnd()<0.26){const soul=(dA>=4?60:0)-(dB>=4?60:0);const pa=logistic(pL+gd/30+soul);const s=rnd()<pa?'A':'B';
+      const k1=3+Math.floor(rnd()*3),k2=Math.floor(rnd()*3);
+      if(s==='A'){kA+=k1;kB+=k2;gd+=1300}else{kB+=k1;kA+=k2;gd-=1300}
+      const lead=s==='A'?gd:-gd;const end=t>=36?0.6:lead>5000?0.55:lead>2500?0.32:0.14;
+      const baron=rnd()<0.55;if(baron){if(s==='A')baronA++;else baronB++}
+      L(t,s,`${t>=34&&rnd()<.4?'장로 드래곤 한타':'대규모 한타'} 승리 (${k1}:${k2})${baron?' · 바론 획득':''}`);
+      if(rnd()<end){winner=s;L(t,s,'넥서스 파괴');gold.push(Math.round(gd));break}}
+    gold.push(Math.round(gd));
+  }
+  if(!winner){winner=gd>=0?'A':'B';t=Math.min(t,55);L(t,winner,'넥서스 파괴')}
+  return{winner,t,kA,kB,dA,dB,gold,events:ev_,baronA,baronB}}
+// ===================== UI =====================
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function ct(key,cls){if(!key)return`<span class="ct empty ${cls||''}">?</span>`;const c=CH[key];return`<span class="ct ${cls||''}" style="--h:${CLS_H[c.cls]}" title="${esc(c.ko)} · ${esc(statShort(key))}">${esc(c.ab)}</span>`}
+const AB=id=>TEAMS[id].ab;
+const pName=pid=>PLAYERS[pid].name;
+const sideCls=p=>p>=0.5?'cb':'cr';
+function teamSelectHTML(sel,onlyWorlds,placeholder){
+  const groups={};TEAM_ORDER.forEach(id=>{const t=TEAMS[id];if(onlyWorlds&&t.worlds!==1)return;(groups[t.league]=groups[t.league]||[]).push(t)});
+  return(placeholder?`<option value=""${sel?'':' selected'}>${placeholder}</option>`:'')+Object.entries(groups).map(([lg,ts])=>`<optgroup label="${lg}">${ts.map(t=>`<option value="${t.id}"${t.id===sel?' selected':''}>${t.worlds===1?'★ ':''}${esc(t.ab)}</option>`).join('')}</optgroup>`).join('')}
+let ALL_PLAYER_OPTS=null;
+function playerOptions(sel){
+  if(!ALL_PLAYER_OPTS){ALL_PLAYER_OPTS=TEAM_ORDER.map(id=>{const t=TEAMS[id];return{label:`${t.league} · ${t.ab}`,ps:t.players}})}
+  return ALL_PLAYER_OPTS.map(g=>`<optgroup label="${esc(g.label)}">${g.ps.map(p=>`<option value="${p.pid}"${p.pid===sel?' selected':''}>${esc(p.name)} (${AB(p.team)} ${ROLE_KO[p.role]}${p.sub?'·서브':''}) ${p.r}</option>`).join('')}</optgroup>`).join('')}
+
+// ---- tournament / player records
+function metaStat(k){const m=META[k];if(!m)return null;return{p:m.p||0,b:m.b||0,pr:(m.p||0)/META_GAMES,br:(m.b||0)/META_GAMES,wr:m.w!=null&&m.p?m.w/m.p:null,w:m.w}}
+function statShort(k){const s=metaStat(k);if(!s)return'월즈 픽·밴 거의 없음';return`월즈 픽 ${pct(s.pr)}% · 밴 ${META[k].b!=null?pct(s.br)+'%':'25%↓'}${s.wr!=null?` · 승 ${pct(s.wr)}%`:''}`}
+function playerRec(pid,k){const r=PCHAMP[pid]&&PCHAMP[pid][k];return r?r:null}
+function recTxt(r){return r?`${r[0]}승 ${r[1]}패`:'—'}
+function comfort(p,k){const i=p.pool.indexOf(k);const s=i===0?'주력 1순위':i>=0?`주력 ${i+1}순위`:'주력 풀 밖';return p.verified?s:s+' (추정)'}
+
+// ---- watch points (shared by all three views)
+// X/Y: {name, tid?, pids, picks}. Returns [{tag, c, h}]
+function watchPoints(ev,X,Y,o={}){
+  const out=[];const add=(tag,c,h)=>out.push({tag,c:c||'',h});
+  const nP=Object.keys(X.picks).length+Object.keys(Y.picks).length;
+  const sc=p=>p>=.5?'b':'r',nm=p=>p>=.5?X.name:Y.name,ck=k=>k?`(${esc(CH[k].ko)})`:'';
+  // 라인전
+  const lanes=[...ev.lanes].filter(l=>l.role!=='jng').sort((a,b)=>Math.abs(b.p-.5)-Math.abs(a.p-.5));const L0=lanes[0];
+  if(L0&&Math.abs(L0.p-.5)>.04){const w=L0.p>=.5;const pw=w?L0.a:L0.b,pl=w?L0.b:L0.a,cw=w?L0.ca:L0.cb,cl=w?L0.cb:L0.ca;
+    add('라인전',sc(L0.p),`<b>${ROLE_KO[L0.role]}: ${esc(pw.name)}${ck(cw)} vs ${esc(pl.name)}${ck(cl)}</b> — ${nm(L0.p)} 라인전 우세 확률 ${pct(Math.max(L0.p,1-L0.p))}%. ${L0.role==='bot'||L0.role==='sup'?'바텀 주도권이 첫 드래곤으로 이어진다.':L0.role==='top'?'솔로킬과 전령 타이밍 탑 압박이 관건.':'미드 주도권을 쥔 쪽이 정글 합류를 먼저 간다.'}`)}
+  // 정글
+  const J=ev.lanes[1];if(Math.abs(J.p-.5)>.03){const w=J.p>=.5;add('정글 주도권',sc(J.p),`<b>정글: ${esc((w?J.a:J.b).name)}${ck(w?J.ca:J.cb)}</b> — 초반 동선 주도 확률 ${pct(Math.max(J.p,1-J.p))}%. 첫 바위게와 공허 유충 싸움을 먼저 열 가능성이 높다.`)}
+  // 시간대
+  const e=ev.pE,l=ev.pL;
+  if(e>.54&&l<.49)add('시간대 구도','b',`<b>${X.name} 초반 · ${Y.name} 후반</b> — ${X.name}는 25분 전에 드래곤·전령으로 굴려야 한다. 넘기면 후반 한타 기대값은 ${Y.name}(${pct(1-l)}%).`);
+  else if(e<.46&&l>.51)add('시간대 구도','r',`<b>${Y.name} 초반 · ${X.name} 후반</b> — ${Y.name}가 초반에 끝내야 하고, ${X.name}는 버티면 후반 한타 승률 ${pct(l)}%.`);
+  else add('시간대 구도',sc((e+l)/2),`<b>초반 ${nm(e)} ${pct(Math.max(e,1-e))}% · 후반 ${nm(l)} ${pct(Math.max(l,1-l))}%</b> — ${Math.sign(e-.5)===Math.sign(l-.5)?'한쪽이 전 구간에서 앞선다. 상대는 오브젝트 앞 변수가 필요하다.':'구간별 우세가 갈려 20~25분 한타가 분기점.'} 예상 경기 시간 ${Math.round(ev.time)}분.`);
+  // 조합 상성
+  if(ev.cA.n>=4&&ev.cB.n>=4){const ia=ev.inter;add('조합 상성',ia>0?'b':ia<0?'r':'',`<b>${ev.cA.archKo} vs ${ev.cB.archKo}</b> — ${ia>0?`상성은 ${X.name} 쪽.`:ia<0?`상성은 ${Y.name} 쪽.`:'상성은 중립, 운영 싸움.'} ${ev.cA.arch===ev.cB.arch?`두 팀 모두 ${ARCH_DESC[ev.cA.arch]}이라, 같은 구도에서 먼저 실행하는 쪽이 가져간다.`:`${X.name}: ${ARCH_DESC[ev.cA.arch]}. ${Y.name}: ${ARCH_DESC[ev.cB.arch]}.`}`)}
+  [[ev.cA,X,'b'],[ev.cB,Y,'r']].forEach(([c,T,s])=>{if(c.syn.length){const t=c.syn[0];const i=t.indexOf(':');add('연계 시너지',s,`<b>${T.name}: ${esc(i>0?t.slice(0,i):t)}</b> — ${i>0?esc(t.slice(i+1).trim()):'조합 안에 바로 이어지는 연계가 있어 한타 시작이 빠르다.'}`)}
+    if(c.notes.length&&c.n>=4)add('조합 약점',s==='b'?'r':'b',`<b>${T.name}: ${esc(c.notes[0])}</b> — 상대가 파고들 지점.`)});
+  // 선수·챔피언
+  let recN=0,sigN=0;
+  [[X,'b'],[Y,'r']].forEach(([T,s])=>ROLES.forEach((r,i)=>{const k=T.picks[r];if(!k)return;const p=PLAYERS[T.pids[i]];const rec=playerRec(p.pid,k);const idx=p.pool.indexOf(k);
+    if(rec&&recN<2){recN++;add('선수 대회 기록',s,`<b>${esc(p.name)}의 ${esc(CH[k].ko)}</b> — 이번 월즈 이 챔피언으로 ${recTxt(rec)}. ${rec[0]>rec[1]?'검증된 카드.':rec[0]<rec[1]?'앞선 경기에서는 졌던 카드.':''}`)}
+    else if(idx===0&&sigN<2){sigN++;add('주력 픽',s,`<b>${esc(p.name)}의 ${esc(CH[k].ko)}</b> — ${p.verified?'2026 시즌 주력 챔피언.':'주력으로 추정되는 챔피언.'} 숙련도 보정이 승률에 들어갔다.`)}
+    else if(CH[k].power<74)add('깜짝 픽',s,`<b>${esc(CH[k].ko)} (${esc(p.name)})</b> — 이번 월즈에서 거의 안 나온 카드. 상대 준비를 비트는 노림수.`)}));
+  // 메타 카드
+  const metaPick=[...ROLES.map(r=>[X.picks[r],'b',X.name]),...ROLES.map(r=>[Y.picks[r],'r',Y.name])].filter(x=>x[0]&&presence(x[0])>=.4).sort((a,b)=>presence(b[0])-presence(a[0]))[0];
+  if(metaPick){const s=metaStat(metaPick[0]);add('메타 카드',metaPick[1],`<b>${esc(CH[metaPick[0]].ko)} (${metaPick[2]})</b> — 이번 월즈 픽 ${s.p}회·밴 ${s.b}회, 관여율 ${pct(presence(metaPick[0]))}%${s.wr!=null?`, 승률 ${pct(s.wr)}%`:''}. 대회 최우선 카드를 가져갔다.`)}
+  // 오브젝트
+  if(nP>=6)add('오브젝트',sc(ev.firstDrag),`<b>첫 드래곤 ${nm(ev.firstDrag)} ${pct(Math.max(ev.firstDrag,1-ev.firstDrag))}%</b> — 15분 예상 골드 차 ${ev.gold15>=0?X.name:Y.name} +${Math.abs(ev.gold15).toLocaleString()}.`);
+  // 대회 폼 / 맞대결
+  if(X.tid&&Y.tid&&X.tid!==Y.tid){const fa=FORM[X.tid]||0,fb=FORM[Y.tid]||0;
+    if(Math.abs(fa-fb)>=8)add('대회 폼',fa>fb?'b':'r',`<b>${fa>fb?X.name:Y.name}의 기세</b> — 이번 월즈 결과로 레이팅 ${X.name} ${fa>=0?'+':''}${Math.round(fa)}, ${Y.name} ${fb>=0?'+':''}${Math.round(fb)}.`);
+    const res=typeof allResults==='function'?allResults():SWISS;const h=res.filter(s=>(s[0]===X.tid&&s[1]===Y.tid)||(s[0]===Y.tid&&s[1]===X.tid));
+    if(h.length)add('맞대결',h[h.length-1][0]===X.tid?'b':'r',`<b>이번 대회 재대결</b> — ${h.map(s=>`${s[4]}라운드 ${AB(s[0])} 승 (${s[2]}:${s[3]})`).join(', ')}. 지난 패배 팀의 밴픽 수정이 포인트.`)}
+  // 선수 체급 (픽 전)
+  if(nP<4){const g=ROLES.map((r,i)=>({r,i,d:PLAYERS[X.pids[i]].r-PLAYERS[Y.pids[i]].r})).sort((a,b)=>Math.abs(b.d)-Math.abs(a.d))[0];
+    if(Math.abs(g.d)>=2)add('선수 체급',g.d>0?'b':'r',`<b>${ROLE_KO[g.r]} 체급 차</b> — ${esc(pName(X.pids[g.i]))} ${PLAYERS[X.pids[g.i]].r} vs ${esc(pName(Y.pids[g.i]))} ${PLAYERS[Y.pids[g.i]].r}. 밴픽에서 이 라인을 견제할지가 관건.`)}
+  // 피어리스
+  if(o.fearless){const depth=T=>new Set(T.pids.flatMap(pid=>PLAYERS[pid].pool.filter(k=>CH[k].power>=78))).size;const dx=depth(X),dy=depth(Y);
+    add('피어리스',dx>dy?'b':dx<dy?'r':'',`<b>챔피언 폭</b> — 주력 메타 챔피언 수 ${X.name} ${dx}개 vs ${Y.name} ${dy}개. ${dx===dy?'폭은 비슷해 세트가 길어질수록 준비한 깜짝 카드 싸움이 된다.':`세트가 길어질수록 ${dx>dy?X.name:Y.name} 쪽이 편하다.`}`)}
+  return out.slice(0,o.max||9)}
+function renderPoints(list){const tags=[...new Set(list.map(x=>x.tag))];
+  return`<div class="factors"><span class="lbl">이 경기 관전 요소</span>${tags.map(t=>`<span class="chip g">${t}</span>`).join('')}</div><ul class="pts">${list.map(p=>`<li class="${p.c}"><span class="ptag">${p.tag}</span>${p.h}</li>`).join('')}</ul>`}
+
+// ---------------- router ----------------
+function route(){const v=(location.hash||'#worlds').slice(1);const ok=['live','virtual','worlds','game'].includes(v)?v:'worlds';
+  document.querySelectorAll('section.view').forEach(s=>s.hidden=s.id!=='v-'+ok);
+  document.querySelectorAll('nav.tabs a').forEach(a=>a.classList.toggle('on',a.dataset.v===ok));
+  if(ok==='virtual'&&!V.ran)runVirtual();
+  if(ok==='worlds'&&!W.ran)runWorlds();
+  if(ok==='game')initGame()}
+window.addEventListener('hashchange',route);
+
+// =============== 1. LIVE ===============
+const L={B:{tid:'BLG',pids:defaultLineup('BLG')},R:{tid:'TES',pids:defaultLineup('TES')},
+  step:0,bans:{B:[],R:[]},picks:{B:{},R:{}},manual:{B:false,R:false},hist:[],locked:new Set(),wp:[],sel:null,roleF:'all',q:'',timerOn:false,tleft:30,example:true};
+function liveState(){return{bans:L.bans,picks:L.picks}}
+function snapshot(){return JSON.stringify({step:L.step,bans:L.bans,picks:L.picks,manual:L.manual,wp:L.wp})}
+function restore(s){Object.assign(L,JSON.parse(s))}
+function usedSet(){return new Set([...L.bans.B,...L.bans.R,...Object.values(L.picks.B),...Object.values(L.picks.R)])}
+function liveEval(){return evaluate({pids:L.B.pids,picks:L.picks.B},{pids:L.R.pids,picks:L.picks.R})}
+
+// Setup cards: built once per team, then only synced, so an open select is never replaced under the finger (mobile pickers).
+function buildSetup(side){
+  const s=L[side],el=$(side==='B'?'#setupB':'#setupR');
+  el.innerHTML=`<div class="trow"><span class="lbl ${side==='B'?'cb':'cr'}">${side==='B'?'블루 진영':'레드 진영'}</span>
+    <select id="tsel${side}" aria-label="${side==='B'?'블루':'레드'} 팀 선택">${teamSelectHTML(s.tid)}</select>
+    <span class="chip g num" id="elo${side}"></span></div><div class="lineup" id="lineup${side}"></div>`;
+  $('#tsel'+side).onchange=e=>{if(!e.target.value)return;s.tid=e.target.value;s.pids=defaultLineup(s.tid);L.manual[side]=false;buildLineup(side);fixAssign(side);renderLive()};
+  buildLineup(side)}
+function buildLineup(side){
+  const s=L[side],t=TEAMS[s.tid];
+  $('#lineup'+side).innerHTML=ROLES.map((r,i)=>`<div class="lu" id="lub${side}${i}"><div class="lbl"><span>${ROLE_KO[r]}</span><span class="cg" id="lus${side}${i}"></span></div>
+      <select id="lu${side}${i}" data-i="${i}" aria-label="${ROLE_KO[r]} 선수">${t.players.map(q=>`<option value="${q.pid}">${esc(q.name)}${q.role!==r?` (${ROLE_KO[q.role]})`:''}${q.sub?' ·서브':''}</option>`).join('')}</select>
+      <div class="rt" id="lur${side}${i}"></div></div>`).join('');
+  $('#lineup'+side).querySelectorAll('select').forEach(sel=>sel.onchange=e=>{const i=+e.target.dataset.i;const np=e.target.value;
+    const j=s.pids.indexOf(np);if(j>=0&&j!==i)s.pids[j]=s.pids[i];s.pids[i]=np;fixAssign(side);renderLive()});
+  syncSetup(side)}
+function syncSetup(side){
+  const s=L[side];const ts=$('#tsel'+side);if(ts&&ts.value!==s.tid)ts.value=s.tid;
+  $('#elo'+side).textContent='레이팅 '+Math.round(lineupElo(s.pids));
+  ROLES.forEach((r,i)=>{const p=PLAYERS[s.pids[i]];const sel=$(`#lu${side}${i}`);if(!sel)return;if(sel.value!==p.pid)sel.value=p.pid;
+    const mis=p.role!==r;$(`#lub${side}${i}`).classList.toggle('warn',mis);$(`#lus${side}${i}`).textContent=p.sub?'서브':'';
+    $(`#lur${side}${i}`).innerHTML=`<span>평점 <b class="num">${p.r}</b></span><span>${mis?'포지션 변경':''}</span>`})}
+function fixAssign(side){if(L.manual[side])return;L.picks[side]=reassign(L[side].pids,Object.values(L.picks[side]))}
+
+function phaseLabel(){
+  if(L.step>=20)return['DRAFT COMPLETE','밴픽 완료'];
+  const st=SEQ[L.step];const p=L.step<6?'BAN PHASE 1':L.step<12?'PICK PHASE 1':L.step<16?'BAN PHASE 2':'PICK PHASE 2';
+  let n=1;for(let i=0;i<L.step;i++)if(SEQ[i].s===st.s&&SEQ[i].t===st.t)n++;
+  return[p,`${st.s==='B'?'블루':'레드'} ${n}${st.t==='ban'?'밴':'픽'}`]}
+
+function renderBoard(ev){
+  const B=TEAMS[L.B.tid],R=TEAMS[L.R.tid];
+  $('#bhB').textContent=B.ab;$('#bhBs').textContent=B.en;$('#bhR').textContent=R.ab;$('#bhRs').textContent=R.en;
+  $('#wpB').textContent=pct(ev.p)+'%';$('#wpR').textContent=(100-pct(ev.p))+'%';
+  const [p1,p2]=phaseLabel();$('#phase1').textContent=p1;$('#phase2').textContent=p2+(L.example?' · AI 예시':'');
+  $('#timer').textContent=L.timerOn?L.tleft:'—';$('#timer').style.color=L.timerOn&&L.tleft<=5?'var(--red)':'';
+  const st=SEQ[L.step];
+  ['B','R'].forEach(side=>{
+    const bans=L.bans[side];let h='';
+    for(let i=0;i<5;i++){const k=bans[i];const act=st&&st.t==='ban'&&st.s===side&&i===bans.length;
+      h+=`<div class="banslot${k?' has':''}${act?' act':''}">${k?ct(k,'sm'):''}</div>`;if(i===2)h+='<span class="gap"></span>'}
+    $(side==='B'?'#bansB':'#bansR').innerHTML=h;
+    const col=$(side==='B'?'#picksB':'#picksR');col.classList.toggle('act',!!(st&&st.t==='pick'&&st.s===side));
+    col.innerHTML=ROLES.map((r,i)=>{const pid=L[side].pids[i],p=PLAYERS[pid],k=L.picks[side][r];
+      let fit='',stat='';
+      if(k){const idx=p.pool.indexOf(k);fit=idx>=0?'<span class="chip g pf">주력</span>':!CH[k].roles.includes(r)?'<span class="chip r pf">포지션 외</span>':'';
+        const rec=playerRec(pid,k);stat=`<div class="ps">${esc(statShort(k))}</div><div class="ps">선수 이번 대회: ${rec?recTxt(rec):'첫 사용'}</div>`}
+      return`<div class="pk${k?' has':''}${L.sel&&L.sel.side===side&&L.sel.role===r?' sel':''}" data-side="${side}" data-role="${r}" role="button" tabindex="0" aria-label="${ROLE_KO[r]} ${esc(p.name)}">
+        ${k?ct(k,'lg'):ct(null,'lg')}<div class="pi"><div class="lbl">${ROLE_KO[r]}</div><b>${esc(p.name)} ${fit}</b><span>${k?esc(CH[k].ko):(st&&st.t==='pick'&&st.s===side?'선택 중…':'—')}</span>${stat}</div></div>`}).join('');
+  });
+  document.querySelectorAll('.pk').forEach(el=>{el.onclick=()=>pickSlotClick(el.dataset.side,el.dataset.role);el.onkeydown=e=>{if(e.key==='Enter')pickSlotClick(el.dataset.side,el.dataset.role)}});
+  const used=usedSet();const q=L.q.trim().toLowerCase().replace(/[\s'.&]/g,'');
+  const list=CH_LIST.filter(c=>(L.roleF==='all'||c.roles.includes(L.roleF))&&(!q||c.ko.replace(/\s/g,'').includes(q)||(c.en+c.key).toLowerCase().replace(/[\s'.&]/g,'').includes(q)))
+    .sort((a,b)=>a.ko.localeCompare(b.ko,'ko'));
+  $('#champGrid').innerHTML=list.map(c=>{const dis=used.has(c.key)||L.locked.has(c.key)||L.step>=20;const s=metaStat(c.key);
+    return`<button class="gc${L.locked.has(c.key)?' fl':''}" data-k="${c.key}"${dis?' disabled':''} title="${esc(c.ko)} · ${CLS_KO[c.cls]} · ${esc(statShort(c.key))}">${ct(c.key)}<span class="nm">${esc(c.ko)}</span>${s?`<span class="pr">${pct(presence(c.key))}%</span>${s.wr!=null?`<span class="wr">${pct(s.wr)}%</span>`:''}`:''}</button>`}).join('')||'<p class="muted">검색 결과가 없습니다.</p>';
+  $('#champGrid').querySelectorAll('.gc').forEach(b=>b.onclick=()=>doStep(b.dataset.k));
+  $('#fearless').innerHTML=L.locked.size?`<span class="lbl" style="color:var(--warn)">피어리스 잠금 ${L.locked.size}</span> ${[...L.locked].map(k=>`<span class="chip">${esc(CH[k].ko)}</span>`).join('')}`:'<span class="dim">피어리스 잠금 없음 — 세트가 끝나면 ‘다음 세트’를 눌러 사용된 챔피언을 잠그세요.</span>';
+  $('#bUndo').disabled=!L.hist.length;$('#bAuto').disabled=L.step>=20;
+  $('#bTimer').textContent=L.timerOn?'타이머 끄기':'타이머 켜기';
+}
+function renderReco(){
+  const el=$('#reco');if(L.step>=20){el.innerHTML='<span class="lbl">밴픽 완료</span><span class="muted">아래 분석에서 최종 예측을 확인하세요.</span>';return}
+  const st=SEQ[L.step],side=st.s,opp=side==='B'?'R':'B';const used=usedSet();
+  const avail=CH_LIST.filter(c=>!used.has(c.key)&&!L.locked.has(c.key));
+  const scored=[];
+  avail.forEach(c=>{
+    const who=st.t==='pick'?side:opp;const picks={...L.picks[who]};const pids=L[who].pids;
+    let np;if(L.manual[who]){const r=bestRole(pids,picks,c.key);if(!r)return;picks[r]=c.key;np=picks}else{const ks=Object.values(picks);if(ks.length>=5)return;np=reassign(pids,[...ks,c.key])}
+    const A={pids:L.B.pids,picks:who==='B'?np:L.picks.B},B={pids:L.R.pids,picks:who==='R'?np:L.picks.R};
+    const p=evaluate(A,B).p;scored.push({k:c.key,v:who==='B'?p:1-p})});
+  scored.sort((a,b)=>b.v-a.v);
+  el.innerHTML=`<span class="lbl">${st.t==='pick'?'추천 픽 (픽 후 예상 승률)':'추천 밴 (상대가 가져갈 때 상대 승률)'}</span>`+scored.slice(0,5).map(s=>`<span class="ri" data-k="${s.k}" title="${esc(statShort(s.k))}">${ct(s.k,'sm')}<span>${esc(CH[s.k].ko)}</span><span class="num ${side==='B'?'cb':'cr'}">${pct(s.v)}%</span></span>`).join('');
+  el.querySelectorAll('.ri').forEach(r=>r.onclick=()=>doStep(r.dataset.k));
+}
+function doStep(key){
+  if(L.step>=20)return;const used=usedSet();if(used.has(key)||L.locked.has(key))return;
+  L.example=false;L.hist.push(snapshot());const st=SEQ[L.step];
+  if(st.t==='ban')L.bans[st.s].push(key);
+  else{if(L.manual[st.s]){const r=bestRole(L[st.s].pids,L.picks[st.s],key);if(r)L.picks[st.s][r]=key}else{L.picks[st.s]=reassign(L[st.s].pids,[...Object.values(L.picks[st.s]),key])}}
+  L.step++;L.tleft=30;L.sel=null;renderLive()}
+function pickSlotClick(side,role){
+  if(!L.picks[side][role]&&!(L.sel&&L.sel.side===side))return;
+  if(L.sel&&L.sel.side===side&&L.sel.role!==role){const a=L.picks[side][L.sel.role],b=L.picks[side][role];
+    L.hist.push(snapshot());if(b)L.picks[side][L.sel.role]=b;else delete L.picks[side][L.sel.role];if(a)L.picks[side][role]=a;else delete L.picks[side][role];
+    L.manual[side]=true;L.sel=null;renderLive();return}
+  L.sel=(L.sel&&L.sel.side===side&&L.sel.role===role)?null:{side,role};renderBoard(liveEval())}
+
+function lanesHTML(ev,A,B){return ev.lanes.map(l=>`<div class="lane">
+    <div class="sd">${ct(l.ca,'sm')}<div><b>${esc(l.a.name)}</b><span>${l.ca?esc(CH[l.ca].ko):'미정'}</span></div></div>
+    <div class="pc cb num">${pct(l.p)}%</div>
+    <div><div class="bar"><i style="width:${pct(l.p)}%"></i></div><div class="rl">${ROLE_KO[l.role]}${Math.abs(l.p-.5)>.1?` · ${l.p>.5?A:B} 우세`:' · 팽팽'}</div></div>
+    <div class="pc cr num">${100-pct(l.p)}%</div>
+    <div class="sd r">${ct(l.cb,'sm')}<div><b>${esc(l.b.name)}</b><span>${l.cb?esc(CH[l.cb].ko):'미정'}</span></div></div></div>`).join('')}
+function renderAnalysis(ev){
+  const pB=pct(ev.p),A=AB(L.B.tid),B=AB(L.R.tid);
+  $('#wpbB').style.width=pB+'%';$('#wpbB').textContent=`${A} ${pB}%`;$('#wpbR').style.width=(100-pB)+'%';$('#wpbR').textContent=`${100-pB}% ${B}`;
+  const nP=Object.keys(L.picks.B).length+Object.keys(L.picks.R).length;
+  $('#wpNote').textContent=nP<10?`픽 ${nP}/10 · 남은 픽은 평균 수준으로 가정`:'밴픽 완료 기준';
+  const ph=[['초반','라인전 ~ 14분',ev.pE,'라인전·정글 주도권, 첫 오브젝트'],['중반','14 ~ 25분',ev.pM,'전령·드래곤 앞 교전과 운영'],['후반','25분 이후',ev.pL,'바론·장로 한타, 후반 캐리력']];
+  $('#phaseCards').innerHTML=ph.map(([t,s,p,d])=>`<div class="ph"><div class="lbl">${t} · ${s}</div><div class="v ${sideCls(p)} num">${p>=.5?A:B} ${pct(Math.max(p,1-p))}%</div><p>${d}</p><div class="mini"><i style="width:${pct(p)}%"></i></div></div>`).join('');
+  const g=ev.gold15;
+  $('#kvSmall').innerHTML=`<div><b class="num ${g>=0?'cb':'cr'}">${g>=0?'+':''}${g.toLocaleString()}</b><span>15분 예상 골드 차 (블루 기준)</span></div><div><b class="num">${Math.round(ev.time)}분</b><span>예상 경기 시간</span></div>`;
+  $('#lanes').innerHTML=lanesHTML(ev,A,B);
+  $('#points').innerHTML=renderPoints(watchPoints(ev,{name:A,tid:L.B.tid,pids:L.B.pids,picks:L.picks.B},{name:B,tid:L.R.tid,pids:L.R.pids,picks:L.picks.R},{fearless:+$('#liveGame').value>1||L.locked.size>0}));
+  renderDraftTable();renderComp(ev);renderSpark();
+}
+function renderDraftTable(){
+  const rows=[];const opp=s=>s==='B'?'R':'B';
+  ['B','R'].forEach(side=>{
+    L.bans[side].forEach(k=>{const tgt=ROLES.map((r,i)=>PLAYERS[L[opp(side)].pids[i]]).find(p=>p.pool.slice(0,3).includes(k));
+      rows.push({side,type:'밴',k,who:tgt?`표적: ${tgt.name}`:'—',rec:tgt?recTxt(playerRec(tgt.pid,k)):'—',cf:tgt?comfort(tgt,k):'—'})});
+    ROLES.forEach((r,i)=>{const k=L.picks[side][r];if(!k)return;const p=PLAYERS[L[side].pids[i]];rows.push({side,type:ROLE_KO[r],k,who:p.name,rec:recTxt(playerRec(p.pid,k)),cf:comfort(p,k)})});
+  });
+  if(!rows.length){$('#draftTable').innerHTML='<p class="muted">밴이나 픽이 들어오면 챔피언별 이번 대회 기록이 여기에 쌓입니다.</p>';return}
+  $('#draftTable').innerHTML=`<div class="tbl"><table class="st"><thead><tr><th>팀</th><th>구분</th><th>챔피언</th><th>선수</th><th>월즈 픽률</th><th>밴률</th><th>대회 승률</th><th>선수 이번 대회</th><th>선수 숙련도</th></tr></thead><tbody>${rows.map(x=>{const s=metaStat(x.k);
+    return`<tr><td class="${x.side==='B'?'cb':'cr'}"><b>${AB(L[x.side].tid)}</b></td><td>${x.type==='밴'?'<span class="chip r">밴</span>':`<span class="chip">${x.type}</span>`}</td><td><span style="display:inline-flex;align-items:center;gap:6px">${ct(x.k,'sm')}${esc(CH[x.k].ko)}</span></td><td>${esc(x.who)}</td>
+    <td class="num">${s?`${pct(s.pr)}% <span class="dim">(${s.p})</span>`:'—'}</td><td class="num">${s?(META[x.k].b!=null?`${pct(s.br)}% <span class="dim">(${s.b})</span>`:'25% 미만'):'—'}</td><td class="num">${s&&s.wr!=null?`${pct(s.wr)}% <span class="dim">(${s.w}-${s.p-s.w})</span>`:'—'}</td><td class="num">${x.rec}</td><td>${x.cf}</td></tr>`}).join('')}</tbody></table></div>`}
+function renderComp(ev){
+  const box=(c,side)=>{const tid=AB(L[side].tid);if(!c.n)return`<div class="cs"><h4 class="${side==='B'?'cb':'cr'}">${tid}</h4><p class="muted">픽이 들어오면 조합 분석이 표시됩니다.</p></div>`;
+    const ap=Math.round(c.ap/c.n*100);const tags=Object.entries(c.cnt).sort((a,b)=>b[1]-a[1]).slice(0,6);
+    const stars=v=>'●'.repeat(Math.round(v))+'○'.repeat(5-Math.round(v));
+    return`<div class="cs"><h4><span class="${side==='B'?'cb':'cr'}">${tid}</span> · ${c.archKo}</h4><div class="muted" style="font-size:12.5px">${ARCH_DESC[c.arch]}</div>
+      <div class="dmg"><i style="width:${100-ap}%;background:#c9733f"></i><i style="width:${ap}%;background:#5a7fd6"></i></div>
+      <div style="font-size:12px" class="muted">물리 ${100-ap}% · 마법 ${ap}% · 앞라인 ${c.front}명</div>
+      <div style="font-size:12px;margin-top:4px">초반 <span class="cg">${stars(c.curve[0])}</span> 중반 <span class="cg">${stars(c.curve[1])}</span> 후반 <span class="cg">${stars(c.curve[2])}</span></div>
+      <div class="tagrow">${tags.map(([t,n])=>`<span class="chip">${TAG_KO[t]} ${n}</span>`).join('')}${c.syn.map(s=>`<span class="chip ok">${esc(s.split(':')[0].replace(/ 연계$/,''))}</span>`).join('')}${c.notes.map(n=>`<span class="chip r">${esc(n)}</span>`).join('')}</div></div>`};
+  $('#compBox').innerHTML=box(ev.cA,'B')+box(ev.cB,'R');
+  const notes=[];const picked=[...Object.values(L.picks.B),...Object.values(L.picks.R)];
+  const allBans=[...L.bans.B,...L.bans.R];
+  const open=['Nocturne','Vi','Cassiopeia','Olaf','Syndra'].filter(k=>!allBans.includes(k)&&!picked.includes(k)&&!L.locked.has(k));
+  if(L.step>=6&&open.length)notes.push(`<b>밴 없이 풀린 대회 최다 밴 챔피언</b> — ${open.map(k=>`${esc(CH[k].ko)}(밴 ${META[k].b})`).join(', ')}. 다음 픽 차례에 가져가면 큰 이득.`);
+  const topBan=allBans.filter(k=>META[k]&&META[k].b).sort((a,b)=>META[b].b-META[a].b).slice(0,3);
+  if(topBan.length)notes.push(`<b>이번 밴 중 대회 밴률 상위</b> — ${topBan.map(k=>`${esc(CH[k].ko)} ${pct(META[k].b/META_GAMES)}%`).join(', ')}. 대회 흐름대로의 견제.`);
+  notes.push(`<b>패치 26.20 월즈 메타</b> — 정글 녹턴·바이·리 신·자르반, 미드 오리아나·신드라·카시오페아, 탑 럼블·암베사·크산테, 원딜 이즈리얼·진·칼리스타, 서폿 알리스타·노틸러스·레나타가 중심. 53경기 기준 녹턴 40밴, 바이 31밴, 카시오페아 29밴. 승률은 카시오페아(6승 1패), 노틸러스·바이(약 65%)가 높고 아칼리(25%)·알리스타(29%)는 픽 대비 성적이 낮다.`);
+  $('#metaNotes').innerHTML=notes.map(n=>`<li>${n}</li>`).join('');
+}
+function renderSpark(){
+  const pts=L.wp;const W=300,H=110;const x=i=>10+i*(W-20)/20,y=p=>8+(1-p)*(H-24);
+  let s=`<line x1="10" x2="${W-10}" y1="${y(.5)}" y2="${y(.5)}" stroke="var(--line2)" stroke-dasharray="3 3"/>`;
+  [[0,'밴1'],[6,'픽1'],[12,'밴2'],[16,'픽2']].forEach(([i,t])=>{s+=`<line x1="${x(i)}" x2="${x(i)}" y1="6" y2="${H-16}" stroke="var(--line)"/><text x="${x(i)+2}" y="${H-4}" fill="var(--muted)" font-size="9">${t}</text>`});
+  s+=`<text x="${W-10}" y="${y(.5)-3}" fill="var(--muted)" font-size="9" text-anchor="end">50%</text>`;
+  if(pts.length){const d=pts.map((p,i)=>`${i?'L':'M'}${x(p.s).toFixed(1)} ${y(p.p).toFixed(1)}`).join(' ');
+    const area=d+` L${x(pts[pts.length-1].s).toFixed(1)} ${y(.5)} L${x(pts[0].s).toFixed(1)} ${y(.5)} Z`;
+    s+=`<path d="${area}" fill="var(--blueDim)" stroke="none"/><path d="${d}" fill="none" stroke="var(--gold)" stroke-width="2"/>`;
+    const last=pts[pts.length-1];s+=`<circle cx="${x(last.s)}" cy="${y(last.p)}" r="3.5" fill="var(--gold2)"/>`}
+  $('#spark').innerHTML=s}
+function renderLive(){
+  syncSetup('B');syncSetup('R');
+  const ev=liveEval();
+  L.wp=L.wp.filter(p=>p.s<L.step);L.wp.push({s:L.step,p:ev.p});
+  renderBoard(ev);renderReco();renderAnalysis(ev)}
+function renderAllLive(){buildSetup('B');buildSetup('R');renderLive()}
+function resetDraft(){L.step=0;L.bans={B:[],R:[]};L.picks={B:{},R:{}};L.manual={B:false,R:false};L.hist=[];L.wp=[];L.sel=null;L.tleft=30;L.example=false}
+function bindLive(){
+  $('#roleFilter').querySelectorAll('button').forEach(b=>b.onclick=()=>{L.roleF=b.dataset.r;$('#roleFilter').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));renderBoard(liveEval())});
+  $('#champSearch').oninput=e=>{L.q=e.target.value;renderBoard(liveEval())};
+  $('#bUndo').onclick=()=>{if(!L.hist.length)return;restore(L.hist.pop());L.sel=null;renderLive()};
+  $('#bReset').onclick=()=>{resetDraft();renderLive()};
+  $('#bSwap').onclick=()=>{[L.B,L.R]=[L.R,L.B];[L.bans.B,L.bans.R]=[L.bans.R,L.bans.B];[L.picks.B,L.picks.R]=[L.picks.R,L.picks.B];[L.manual.B,L.manual.R]=[L.manual.R,L.manual.B];L.wp=[];renderAllLive()};
+  $('#bAuto').onclick=()=>{const rnd=mulberry(Date.now());L.hist.push(snapshot());L.example=false;
+    while(L.step<20){const st=SEQ[L.step];const k=aiStep(liveState(),st,L.B.pids,L.R.pids,L.locked,rnd);if(!k)break;
+      if(st.t==='ban')L.bans[st.s].push(k);else if(L.manual[st.s]){const r=bestRole(L[st.s].pids,L.picks[st.s],k);if(r)L.picks[st.s][r]=k}else L.picks[st.s]=reassign(L[st.s].pids,[...Object.values(L.picks[st.s]),k]);
+      L.step++;const e=liveEval();L.wp=L.wp.filter(p=>p.s<L.step);L.wp.push({s:L.step,p:e.p})}
+    renderLive()};
+  $('#bNext').onclick=()=>{[...Object.values(L.picks.B),...Object.values(L.picks.R)].forEach(k=>L.locked.add(k));
+    const g=$('#liveGame');g.value=String(Math.min(5,+g.value+1));resetDraft();renderLive()};
+  $('#liveGame').onchange=e=>{if(e.target.value==='1')L.locked.clear();renderLive()};
+  $('#bTimer').onclick=()=>{L.timerOn=!L.timerOn;L.tleft=30;renderBoard(liveEval())};
+  setInterval(()=>{if(!L.timerOn||L.step>=20)return;if(L.tleft>0)L.tleft--;const t=$('#timer');t.textContent=L.tleft;t.style.color=L.tleft<=5?'var(--red)':''},1000);
+}
+function liveExample(){const rnd=mulberry(20261030);
+  for(let i=0;i<9;i++){const st=SEQ[L.step];const k=aiStep(liveState(),st,L.B.pids,L.R.pids,L.locked,rnd);
+    if(st.t==='ban')L.bans[st.s].push(k);else L.picks[st.s]=reassign(L[st.s].pids,[...Object.values(L.picks[st.s]),k]);
+    L.wp.push({s:L.step,p:liveEval().p});L.step++}
+  L.example=true}
+
+// =============== 2. VIRTUAL ===============
+const V={A:['HLE:Zeus','GEN:Canyon','T1:Faker','GEN:Ruler','T1:Keria'],B:['IG:TheShy','AL:Tarzan','BLG:Knight','BLG:Viper','BLG:ON'],over:{A:{},B:{}},ran:false,seed:1,st:null,load:{A:'',B:''}};
+function buildVSide(side){
+  const el=$(side==='A'?'#vA':'#vB');
+  el.innerHTML=ROLES.map((r,i)=>`<div class="vrow"><span class="lbl">${ROLE_KO[r]}</span>
+    <select id="vp${side}${i}" data-i="${i}" aria-label="${side}팀 ${ROLE_KO[r]} 선수">${playerOptions(V[side][i])}</select><div class="rk" id="vm${side}${i}"></div></div>`).join('');
+  el.querySelectorAll('select').forEach(s=>s.onchange=e=>{V[side][+e.target.dataset.i]=e.target.value;V.over[side]={};V.load[side]='';syncV(side);queueVirtual()});
+  const ld=$(side==='A'?'#vLoadA':'#vLoadB');ld.innerHTML=teamSelectHTML('',false,'팀 통째로 불러오기…');
+  ld.onchange=e=>{const v=e.target.value;if(!v)return;V[side]=defaultLineup(v);V.over[side]={};V.load[side]=v;syncV(side);queueVirtual()};
+  syncV(side)}
+function syncV(side){
+  ROLES.forEach((r,i)=>{const p=PLAYERS[V[side][i]];const s=$(`#vp${side}${i}`);if(s.value!==p.pid)s.value=p.pid;
+    $(`#vm${side}${i}`).innerHTML=`${AB(p.team)} · 평점 <b class="num">${p.r}</b>${p.role!==r?` · <span style="color:var(--warn)">본 포지션 ${ROLE_KO[p.role]}</span>`:''}`});
+  $(side==='A'?'#vEloA':'#vEloB').textContent='레이팅 '+Math.round(lineupElo(V[side]));
+  const ld=$(side==='A'?'#vLoadA':'#vLoadB');if(ld.value!==V.load[side])ld.value=V.load[side];
+  const cnt={};V[side].forEach(pid=>{const t=PLAYERS[pid].team;cnt[t]=(cnt[t]||0)+1});
+  const lab=$(side==='A'?'#vLabA':'#vLabB');const full=Object.entries(cnt).find(([t,n])=>n===5);lab.textContent=full?`현재: ${AB(full[0])} 라인업`:'혼합 라인업'}
+let vTimer=null;
+function queueVirtual(keep){clearTimeout(vTimer);vTimer=setTimeout(()=>runVirtual(keep),180)}
+function allStar(filter,rnd){return ROLES.map(r=>{const c=Object.values(PLAYERS).filter(p=>p.role===r&&!p.sub&&filter(p));return(rnd?c[Math.floor(rnd()*c.length)]:c.sort((a,b)=>b.r-a.r)[0]).pid})}
+function ensureVShell(){if($('#vRes1'))return;
+  $('#vResult').innerHTML=`<div class="card s7" id="vRes1"></div><div class="card s5"><h3>AI 밴픽 <small>챔피언을 바꾸면 다시 계산</small></h3><div id="vDraft"></div><button class="btn" id="vReroll">다른 밴픽으로 다시</button></div>
+   <div class="card s12"><h3>관전 포인트</h3><div id="vPts"></div></div>
+   <div class="card s7" id="vGold"></div><div class="card s5"><h3>대표 경기 타임라인</h3><div class="tl" id="vTl"></div></div>
+   <div class="card s12"><h3>라인별 매치업 <small>A팀 기준 라인전 우세 확률</small></h3><div id="vLanes"></div></div>`;
+  $('#vReroll').onclick=()=>{V.seed++;V.over={A:{},B:{}};runVirtual()}}
+function vDraftHTML(st,A,B){const col=(k,side)=>{const pids=side==='A'?A:B;
+    return`<div class="gp${side==='B'?' r':''}"><div class="bnr">${st.bans[k].map(b=>ct(b,'sm')).join('')}</div>${ROLES.map((r,i)=>`<div class="row"><span id="vct${side}${r}">${ct(st.picks[k][r],'sm')}</span><span><b>${esc(pName(pids[i]))}</b><select id="vch${side}${r}" data-side="${side}" data-r="${r}" class="vch" aria-label="${esc(pName(pids[i]))} 챔피언 변경">${CH_LIST.filter(c=>c.roles.includes(r)||c.key===st.picks[k][r]).sort((a,b)=>a.ko.localeCompare(b.ko,'ko')).map(c=>`<option value="${c.key}"${c.key===st.picks[k][r]?' selected':''}>${esc(c.ko)}</option>`).join('')}</select><span class="ps" id="vps${side}${r}">${esc(statShort(st.picks[k][r]))}</span></span></div>`).join('')}</div>`};
+  return`<div class="gdraft"><div class="gs">${col('B','A')}${col('R','B')}</div></div>`}
+function runVirtual(keepDraft){
+  V.ran=true;ensureVShell();const A=V.A,B=V.B;
+  if(!keepDraft||!V.st){V.st=aiDraft(A,B,new Set(),hash(A.join()+B.join())+V.seed);V.base=JSON.parse(JSON.stringify(V.st.picks))}
+  const st={bans:V.st.bans,picks:{B:{...V.base.B},R:{...V.base.R}}};
+  ['A','B'].forEach(s=>{const k=s==='A'?'B':'R';Object.entries(V.over[s]).forEach(([r,c])=>{st.picks[k][r]=c})});
+  const ev=evaluate({pids:A,picks:st.picks.B},{pids:B,picks:st.picks.R});
+  const N=2000,rnd=mulberry(hash(A.join()+B.join()+JSON.stringify(st.picks)));
+  let wA=0,tSum=0,kSum=0,soulA=0,soulB=0;
+  for(let i=0;i<N;i++){const g=simGame(ev,rnd,false);if(g.winner==='A')wA++;tSum+=g.t;kSum+=g.kA+g.kB;if(g.dA>=4)soulA++;if(g.dB>=4)soulB++}
+  const pA=wA/N,avgT=tSum/N;
+  let rep=null;for(let i=0;i<80;i++){const g=simGame(ev,rnd,true);if(!rep)rep=g;if((g.winner==='A')===(pA>=.5)&&Math.abs(g.t-avgT)<=4){rep=g;break}}
+  const win=pA>=.5?'A':'B';const wp=win==='A'?A:B,wk=win==='A'?st.picks.B:st.picks.R;
+  const mvp=ROLES.map((r,i)=>({p:PLAYERS[wp[i]],k:wk[r],v:PLAYERS[wp[i]].r+(wk[r]?champDelta(PLAYERS[wp[i]],wk[r],r):0)+RW[r]*10})).sort((a,b)=>b.v-a.v)[0];
+  const s3=seriesDist(Array(3).fill(.5+(pA-.5)*.95)),s5=seriesDist(Array(5).fill(.5+(pA-.5)*.95));
+  $('#vRes1').innerHTML=`<h3>시뮬레이션 결과 <small>${N.toLocaleString()}회 · 단판 기준</small></h3>
+    <div class="wpbar"><div class="b" style="width:${pct(pA)}%">A ${pct(pA)}%</div><div class="r" style="width:${100-pct(pA)}%">${100-pct(pA)}% B</div></div>
+    <div class="series" style="margin-top:12px">
+      <div><span class="lbl">단판</span><b class="num ${sideCls(pA)}">${pct(Math.max(pA,1-pA))}%</b><span class="muted" style="font-size:12px">${win}팀 승</span></div>
+      <div><span class="lbl">3판 2선승</span><b class="num ${sideCls(s3.pA)}">${pct(Math.max(s3.pA,1-s3.pA))}%</b><span class="muted" style="font-size:12px">최빈 ${s3.scores.slice().sort((a,b)=>b[1]-a[1])[0][0]}</span></div>
+      <div><span class="lbl">5판 3선승</span><b class="num ${sideCls(s5.pA)}">${pct(Math.max(s5.pA,1-s5.pA))}%</b><span class="muted" style="font-size:12px">최빈 ${s5.scores.slice().sort((a,b)=>b[1]-a[1])[0][0]}</span></div></div>
+    <div class="kv" style="margin-top:12px">
+      <div><b class="num">${avgT.toFixed(1)}분</b><span>평균 경기 시간</span></div><div><b class="num">${(kSum/N).toFixed(1)}</b><span>평균 총 킬</span></div>
+      <div><b class="num cb">${pct(soulA/N)}%</b><span>A팀 드래곤 영혼</span></div><div><b class="num cr">${pct(soulB/N)}%</b><span>B팀 드래곤 영혼</span></div></div>
+    <ul class="pts" style="margin-top:12px"><li class="${win==='A'?'b':'r'}"><span class="ptag">예상 MVP</span><b>${esc(mvp.p.name)}${mvp.k?` (${esc(CH[mvp.k].ko)})`:''}</b> — 이긴 시뮬레이션에서 가장 큰 기여가 예상되는 선수.</li></ul>`;
+  if(!keepDraft){$('#vDraft').innerHTML=vDraftHTML(st,A,B);
+    $('#vDraft').querySelectorAll('.vch').forEach(s=>s.onchange=e=>{const sd=e.target.dataset.side,r=e.target.dataset.r,k=e.target.value;V.over[sd][r]=k;
+      $(`#vct${sd}${r}`).innerHTML=ct(k,'sm');$(`#vps${sd}${r}`).textContent=statShort(k);queueVirtual(true)})}
+  $('#vPts').innerHTML=renderPoints(watchPoints(ev,{name:'A팀',pids:A,picks:st.picks.B},{name:'B팀',pids:B,picks:st.picks.R},{}));
+  const gw=rep.gold;const GW=560,GH=170;const mx=Math.max(3000,...gw.map(Math.abs));const gx=i=>30+i*(GW-40)/Math.max(1,gw.length-1),gy=v=>GH/2-v/mx*(GH/2-14);
+  let gs=`<line x1="30" x2="${GW-10}" y1="${GH/2}" y2="${GH/2}" stroke="var(--line2)"/>`;
+  [-1,1].forEach(sg=>{const v=Math.round(mx*0.66/1000)*1000*sg;if(v)gs+=`<line x1="30" x2="${GW-10}" y1="${gy(v)}" y2="${gy(v)}" stroke="var(--line)" stroke-dasharray="2 4"/><text x="26" y="${gy(v)+3}" fill="var(--muted)" font-size="10" text-anchor="end">${v>0?'+':''}${v/1000}k</text>`});
+  for(let m=10;m<gw.length;m+=10)gs+=`<text x="${gx(m)}" y="${GH-2}" fill="var(--muted)" font-size="10" text-anchor="middle">${m}분</text>`;
+  const fillPath=f=>gw.map((v,i)=>`${i?'L':'M'}${gx(i).toFixed(1)} ${gy(f(v)).toFixed(1)}`).join(' ')+` L${gx(gw.length-1)} ${GH/2} L30 ${GH/2}Z`;
+  gs+=`<path d="${fillPath(v=>Math.max(0,v))}" fill="rgba(75,159,234,.35)"/><path d="${fillPath(v=>Math.min(0,v))}" fill="rgba(232,87,78,.35)"/><path d="${gw.map((v,i)=>`${i?'L':'M'}${gx(i).toFixed(1)} ${gy(v).toFixed(1)}`).join(' ')}" fill="none" stroke="var(--gold2)" stroke-width="1.6"/>`;
+  gs+=`<text x="34" y="14" fill="var(--blue)" font-size="11">A팀 골드 우위</text><text x="34" y="${GH-14}" fill="var(--red)" font-size="11">B팀 골드 우위</text>`;
+  $('#vGold').innerHTML=`<h3>대표 경기 골드 그래프 <small>${rep.winner}팀 승 · ${rep.t}분 · 킬 ${rep.kA}:${rep.kB}</small></h3><svg viewBox="0 0 ${GW} ${GH}" style="width:100%;height:auto" role="img" aria-label="대표 경기 골드 차이">${gs}</svg>`;
+  $('#vTl').innerHTML=rep.events.map(e=>`<div class="${e.s==='A'?'b':'r'}"><em>${e.m}분</em><span><b>${e.s}팀</b> ${esc(e.txt)}</span></div>`).join('');
+  $('#vLanes').innerHTML=lanesHTML(ev,'A팀','B팀');
+}
+function bindVirtual(){
+  buildVSide('A');buildVSide('B');
+  $('#vRun').onclick=()=>{V.seed++;V.over={A:{},B:{}};runVirtual()};
+  $('#vRandom').onclick=()=>{const rnd=mulberry(Date.now());V.A=allStar(p=>TEAMS[p.team].worlds===1,rnd);V.B=allStar(p=>TEAMS[p.team].worlds===1&&!V.A.includes(p.pid),rnd);V.over={A:{},B:{}};V.load={A:'',B:''};syncV('A');syncV('B');runVirtual()};
+  $('#vLck').onclick=()=>{V.A=allStar(p=>TEAMS[p.team].league==='LCK');V.B=allStar(p=>TEAMS[p.team].league==='LPL');V.over={A:{},B:{}};V.load={A:'',B:''};syncV('A');syncV('B');runVirtual()};
+}
+
+// =============== 4. PREDICTION CHALLENGE (free, no stakes, no cash value) ===============
+// Points come from this site's own model probability (difficulty multiplier), never from betting-site odds.
+
+const FORM_OFF={...FORM};
+const pOff=(a,b,bo)=>pSeries(logistic(preElo(a)+(FORM_OFF[a]||0)-preElo(b)-(FORM_OFF[b]||0)),bo);
+const gainFor=p=>Math.round(100/clamp(p,0.15,0.9));
+// Miss costs 80% of what the other side would have earned (max 400). Under a calibrated model each pick has the same small expected value, so volume alone does not win; skill does.
+const lossFor=p=>Math.min(400,Math.round(0.8*gainFor(1-p)));
+const LKEY='rift_challenge_v1';
+const G={mode:'local',uid:null,db:null,me:null,all:[],started:false,rk:'score',note:''};
+
+function loadLocal(){try{return JSON.parse(localStorage.getItem(LKEY)||'null')}catch(e){return null}}
+function saveLocal(me){try{localStorage.setItem(LKEY,JSON.stringify(me))}catch(e){}}
+function statsOf(picks){
+  let score=0,hits=0,done=0,cur=0,best=0;const hist=[];
+  GAME_MATCHES.slice().sort((x,y)=>x.start.localeCompare(y.start)).forEach(m=>{const pk=picks&&picks[m.id];const r=OFFICIAL[m.id];if(!pk||!r)return;
+    done++;const ok=pk.t===r.w;let g;if(ok){g=gainFor(pk.p);hits++;score+=g;cur++;best=Math.max(best,cur)}else{const before=score;score=Math.max(0,score-lossFor(pk.p));g=score-before;cur=0}hist.push({m,pk,r,ok,g})});
+  return{score,hits,done,cur,best,acc:done?hits/done:0,hist}}
+function validNick(n){n=(n||'').trim();if(n.length<2||n.length>12)return'닉네임은 2~12자로 정해 주세요.';
+  if(!/^[가-힣a-zA-Z0-9_]+$/.test(n))return'한글, 영문, 숫자, 밑줄(_)만 쓸 수 있습니다.';
+  if(G.mode==='shared'&&G.all.some(p=>p.nick===n&&p.id!==G.uid))return'이미 쓰는 닉네임입니다.';return''}
+const fmtLeft=ms=>{if(ms<=0)return'예측 마감';const h=Math.floor(ms/3600e3),m=Math.floor(ms%3600e3/60e3);return h>=24?`마감까지 ${Math.floor(h/24)}일 ${h%24}시간`:`마감까지 ${h}시간 ${m}분`};
+const kst=iso=>{const d=new Date(iso);const k=new Date(d.getTime()+9*3600e3);const w='일월화수목금토'[k.getUTCDay()];return`${k.getUTCMonth()+1}/${k.getUTCDate()}(${w}) ${String(k.getUTCHours()).padStart(2,'0')}:${String(k.getUTCMinutes()).padStart(2,'0')}`};
+
+async function initGame(){
+  if(G.started)return;G.started=true;
+  G.me=loadLocal();renderGame();
+  try{const cl=window.claude;if(!cl||!cl.use)throw 0;
+    const [user,db]=await Promise.all([cl.use('user'),cl.use('db')]);
+    if(user&&db){const id=await user.id();const can=await user.can('data.write');G.db=db;
+      db.collection('players').onSnapshot(s=>{G.all=s.docs.filter(d=>d.exists).map(d=>({id:d.id,...d.data()}));if(G.mode==='shared'){const mine=G.all.find(p=>p.id===G.uid);if(mine)G.me={nick:mine.nick,picks:{...(mine.picks||{})}}}renderGame()},()=>{});
+      if(id&&can!==false){G.uid=id;G.mode='shared'}else{G.mode='view';G.note='공유 랭킹은 볼 수 있지만, 이 링크 권한으로는 기록을 저장할 수 없어 내 기록은 이 브라우저에 저장됩니다.'}}
+  }catch(e){}
+  renderGame()}
+async function persist(){
+  if(G.mode==='shared'&&G.db&&G.uid){try{await G.db.doc('players/'+G.uid).set({nick:G.me.nick,picks:G.me.picks,v:1});saveLocal(G.me);return}
+    catch(e){G.mode='view';G.note='공유 랭킹에 저장하지 못해 내 기록은 이 브라우저에 저장됩니다.'}}
+  saveLocal(G.me)}
+function createNick(){const n=$('#gNick').value.trim();const err=validNick(n);$('#gErr').textContent=err;if(err)return;
+  const prev=G.me&&G.me.picks||{};G.me={nick:n,picks:prev,created:Date.now()};persist().then(renderGame);renderGame()}
+function pickTeam(mid,t){const m=GAME_MATCHES.find(x=>x.id===mid);if(!G.me||Date.now()>=Date.parse(m.start)||OFFICIAL[mid])return;
+  const cur=G.me.picks[mid];if(cur&&cur.t===t){delete G.me.picks[mid]}else{const p=m.a===t?pOff(m.a,m.b,m.bo):1-pOff(m.a,m.b,m.bo);G.me.picks[mid]={t,p:Math.round(p*1000)/1000,at:Date.now()}}
+  persist().then(renderGame);renderGame()}
+
+function renderGame(){
+  if(!$('#v-game'))return;
+  const me=G.me,st=me?statsOf(me.picks):null;
+  // profile (keep a half-typed nickname intact)
+  if(me||!$('#gNick'))$('#gProfile').innerHTML=me?`<div class="gp-head"><div><span class="lbl">내 닉네임</span><b class="gnick">${esc(me.nick)}</b></div><span class="chip ${G.mode==='shared'?'ok':''}">${G.mode==='shared'?'공유 랭킹 참여 중':'이 브라우저에 저장'}</span></div>
+    <div class="kv" style="margin-top:10px"><div><b class="num cg">${st.score.toLocaleString()}</b><span>누적 점수</span></div><div><b class="num">${st.hits}<small class="muted"> / ${st.done}</small></b><span>적중 / 결과 나온 예측</span></div>
+    <div><b class="num">${st.cur}</b><span>현재 연속 적중</span></div><div><b class="num">${st.best}</b><span>최고 연속 적중</span></div></div>`
+   :`<span class="lbl">시작하기</span><p style="margin:6px 0 10px">닉네임을 정하면 0점에서 시작합니다. 예측은 무료입니다. 맞히면 오르고 틀리면 깎이지만 0점 아래로는 내려가지 않습니다.</p>
+    <div class="tools"><input type="text" id="gNick" maxlength="12" placeholder="닉네임 (2~12자)" aria-label="닉네임"><button class="btn pri" id="gMake">닉네임 만들기</button></div><div class="gerr" id="gErr" role="alert"></div>`;
+  if(!me&&$('#gMake')){$('#gMake').onclick=createNick;$('#gNick').onkeydown=e=>{if(e.key==='Enter')createNick()}}
+  $('#gNote').textContent=G.note||(G.mode==='local'?'공개 링크로 들어온 방문자는 기록이 각자의 브라우저에 저장됩니다. 브라우저 데이터를 지우면 기록도 사라집니다.':'');
+  // matches
+  const now=Date.now();
+  $('#gMatches').innerHTML=GAME_MATCHES.map(m=>{const p=pOff(m.a,m.b,m.bo);const lock=now>=Date.parse(m.start);const r=OFFICIAL[m.id];const mine=me&&me.picks[m.id];
+    const side=(t,pt)=>{const g=gainFor(pt);const on=mine&&mine.t===t;const res=r?(r.w===t?'win':'lose'):'';
+      return`<button class="gpick${on?' on':''} ${res}" data-m="${m.id}" data-t="${t}"${!me||lock||r?' disabled':''} aria-pressed="${on?'true':'false'}">
+        <b>${AB(t)}</b><span class="num">${pct(pt)}%</span><em>적중 +${g} · 실패 −${lossFor(pt)}</em>${on?'<i>내 예측</i>':''}</button>`};
+    return`<div class="gm"><div class="gm-h"><span class="chip">${esc(m.label)}</span><span class="muted">${kst(m.start)} KST · ${m.bo}판 ${Math.ceil(m.bo/2)}선승</span><span class="${lock?'cr':'cg'}">${r?`결과: ${AB(r.w)} 승 ${r.s||''}`:fmtLeft(Date.parse(m.start)-now)}</span></div>
+      <div class="gm-b">${side(m.a,p)}<span class="vsm">VS</span>${side(m.b,1-p)}</div>
+      ${mine&&!r?`<div class="note">예측 마감 전까지 다시 눌러 바꾸거나 취소할 수 있습니다.${lock?' 결과 대기 중.':''}</div>`:''}</div>`}).join('');
+  $('#gMatches').querySelectorAll('.gpick').forEach(b=>b.onclick=()=>pickTeam(b.dataset.m,b.dataset.t));
+  // history
+  $('#gHist').innerHTML=st&&st.hist.length?st.hist.slice().reverse().map(h=>`<div class="gh-row ${h.ok?'ok':'no'}"><span>${AB(h.m.a)} vs ${AB(h.m.b)}</span><span>내 예측 ${AB(h.pk.t)}</span><span>결과 ${AB(h.r.w)}</span><b class="num ${h.ok?'cg':'cr'}">${h.g>0?'+':h.g<0?'−':'±'}${Math.abs(h.g)}</b></div>`).join('')
+    :'<p class="muted">결과가 나온 예측이 아직 없습니다. 경기 결과는 하루 여러 차례 자동 갱신되며 그때 채점됩니다.</p>';
+  // rankings
+  let rows=[];
+  if(G.mode!=='local'&&G.all.length)rows=G.all.filter(p=>p.nick).map(p=>({id:p.id,nick:p.nick,...statsOf(p.picks||{})}));
+  if(me&&!rows.some(r=>r.id===G.uid&&G.uid)&&!(G.mode==='shared'))rows.push({id:'me',nick:me.nick,...st,local:true});
+  const key={score:'score',hits:'hits',streak:'cur'}[G.rk];
+  rows.sort((a,b)=>b[key]-a[key]||b.score-a.score||b.best-a.best||a.nick.localeCompare(b.nick));
+  const isMe=r=>(G.uid&&r.id===G.uid)||r.local;
+  document.querySelectorAll('#gRankTabs button').forEach(b=>b.classList.toggle('on',b.dataset.k===G.rk));
+  $('#gRank').innerHTML=rows.length?`<table class="st"><thead><tr><th>순위</th><th>닉네임</th><th>누적 점수</th><th>적중</th><th>적중률</th><th>현재 연속</th><th>최고 연속</th></tr></thead><tbody>${rows.slice(0,100).map((r,i)=>`<tr class="${isMe(r)?'me':''}"><td class="num">${i+1}</td><td><b>${esc(r.nick)}</b>${isMe(r)?' <span class="chip g">나</span>':''}</td><td class="num cg">${r.score.toLocaleString()}</td><td class="num">${r.hits}</td><td class="num">${r.done?pct(r.acc)+'%':'—'}</td><td class="num">${r.cur}</td><td class="num">${r.best}</td></tr>`).join('')}</tbody></table>`
+    :'<p class="muted">아직 랭킹에 오른 참가자가 없습니다. 닉네임을 만들고 첫 예측을 해 보세요.</p>';
+  $('#gRankNote').textContent=G.mode==='local'?'지금은 이 브라우저의 내 기록만 보입니다. 공유 랭킹은 저장 권한이 있는 참가자끼리 실시간으로 집계됩니다.':`공유 랭킹 참가자 ${rows.length}명 · 실시간 반영`;
+}
+function bindGame(){
+  document.querySelectorAll('#gRankTabs button').forEach(b=>b.onclick=()=>{G.rk=b.dataset.k;renderGame()});
+  setInterval(()=>{if(!$('#v-game').hidden&&G.me)renderGame()},60000);
+}
+// =============== 3. WORLDS ===============
+const W={res:{},sim:null,ran:false,match:'r4b'};
+const MAIN=TEAM_ORDER.filter(t=>TEAMS[t].worlds===1);
+function allResults(){return[...SWISS,...PENDING.filter(m=>W.res[m.id]&&m.stage!=='ko').map(m=>{const w=W.res[m.id],l=w===m.a?m.b:m.a;return[w,l,2,1,4]})]}
+function records(results){const R={};MAIN.forEach(t=>R[t]={w:0,l:0,gw:0,gl:0,opp:[]});
+  results.forEach(([w,l,wg,lg])=>{R[w].w++;R[l].l++;R[w].gw+=wg;R[w].gl+=lg;R[l].gw+=lg;R[l].gl+=wg;R[w].opp.push(l);R[l].opp.push(w)});return R}
+function shuffle(a,rnd){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function simWorlds(N){
+  computeForm(allResults().slice(SWISS.length));
+  const base=records(allResults());const rnd=mulberry(hash(JSON.stringify(W.res))+99);
+  const memo={};const ps=(a,b,bo)=>{const k=a+b+bo;if(memo[k]==null)memo[k]=pSeries(pGame(a,b),bo);return memo[k]};
+  const C={};MAIN.forEach(t=>C[t]={qf:0,sf:0,fin:0,win:0});
+  const S={qf1b:{},qf3b:{},qf2:{},qf2t:{},sf1a:{},sf1b:{},sf2a:{},sf2b:{},fa:{},fb:{},ch:{}};
+  const inc=(o,k)=>o[k]=(o[k]||0)+1;
+  const pend=PENDING.filter(m=>!W.res[m.id]&&m.stage!=='ko');
+  for(let n=0;n<N;n++){
+    const R={};MAIN.forEach(t=>R[t]={w:base[t].w,l:base[t].l,opp:base[t].opp.slice()});
+    const add=(w,l)=>{R[w].w++;R[l].l++;R[w].opp.push(l);R[l].opp.push(w)};
+    pend.forEach(m=>{const w=rnd()<ps(m.a,m.b,3)?m.a:m.b;add(w,w===m.a?m.b:m.a)});
+    const pool=MAIN.filter(t=>R[t].w===2&&R[t].l===2);
+    let pairs=null;for(let k=0;k<40;k++){const s=shuffle(pool,rnd);const pr=[];let ok=true;for(let i=0;i<s.length;i+=2){if(R[s[i]].opp.includes(s[i+1]))ok=false;pr.push([s[i],s[i+1]])}pairs=pr;if(ok)break}
+    pairs.forEach(([a,b])=>{const w=rnd()<ps(a,b,3)?a:b;add(w,w===a?b:a)});
+    let qf;
+    if(QF_DRAW){qf=QF_DRAW.map(x=>x.slice())}else{
+    const q30=MAIN.filter(t=>R[t].w===3&&R[t].l===0).sort((a,b)=>a==='GEN'?-1:b==='GEN'?1:0),q31=MAIN.filter(t=>R[t].w===3&&R[t].l===1),q32=MAIN.filter(t=>R[t].w===3&&R[t].l===2);
+    if(q30.length!==2||q31.length+q32.length!==6)continue;
+    let best=null,bb=99;
+    for(let k=0;k<30;k++){const s32=shuffle(q32,rnd);const rest=shuffle([...q31,...s32.slice(2)],rnd);
+      const qf=[[q30[0],s32[0]],[rest[0],rest[1]],[q30[1],s32[1]],[rest[2],rest[3]]];
+      const bad=qf.filter(([a,b])=>TEAMS[a].region===TEAMS[b].region).length;if(bad<bb){bb=bad;best=qf}if(!bad)break}
+    qf=best}
+    qf.flat().forEach(t=>C[t].qf++);
+    inc(S.qf1b,qf[0][1]);inc(S.qf3b,qf[2][1]);[qf[1],qf[3]].forEach(pr=>{inc(S.qf2,[...pr].sort().join('|'));pr.forEach(t=>inc(S.qf2t,t))});
+    const wq=qf.map(([a,b],i)=>KO_RESULTS['qf'+(i+1)]||(rnd()<ps(a,b,5)?a:b));wq.forEach(t=>C[t].sf++);
+    inc(S.sf1a,wq[0]);inc(S.sf1b,wq[1]);inc(S.sf2a,wq[2]);inc(S.sf2b,wq[3]);
+    const f1=KO_RESULTS.sf1||(rnd()<ps(wq[0],wq[1],5)?wq[0]:wq[1]),f2=KO_RESULTS.sf2||(rnd()<ps(wq[2],wq[3],5)?wq[2]:wq[3]);C[f1].fin++;C[f2].fin++;inc(S.fa,f1);inc(S.fb,f2);
+    const ch=KO_RESULTS.f||(rnd()<ps(f1,f2,5)?f1:f2);C[ch].win++;inc(S.ch,ch);
+  }
+  return{N,C,S,base}}
+function topOf(o,N,n){return Object.entries(o).sort((a,b)=>b[1]-a[1]).slice(0,n||3).map(([k,v])=>({k,p:v/N}))}
+function runWorlds(){
+  W.ran=true;W.sim=simWorlds(5000);const{N,C,S,base}=W.sim;
+  $('#wTop').innerHTML=SCHEDULE.map(s=>`<div class="${s.now?'now':''}"><span class="lbl">${s.t}</span><b>${s.d}</b><span>${s.s}</span></div>`).join('');
+  // standings
+  const rows=MAIN.slice().sort((a,b)=>(base[b].w-base[b].l)-(base[a].w-base[a].l)||base[b].w-base[a].w||teamElo(b)-teamElo(a));
+  $('#wStand').innerHTML=`<thead><tr><th>팀</th><th>리그</th><th>전적</th><th>세트</th><th>레이팅</th><th>8강</th><th>4강</th><th>우승</th></tr></thead><tbody>`+rows.map(t=>{const r=base[t],c=C[t];const q=r.w>=3,x=r.l>=3;const f=FORM[t]||0;
+    return`<tr class="${q?'q':x?'x':''}"><td><b>${esc(TEAMS[t].ab)}</b> ${q?'<span class="chip ok">8강 확정</span>':x?'<span class="chip">탈락</span>':''}</td><td><span class="chip">${TEAMS[t].league} ${TEAMS[t].seed}</span></td>
+    <td class="num">${r.w}-${r.l}</td><td class="num muted">${r.gw}-${r.gl}</td><td class="num">${Math.round(teamElo(t))} <span class="${f>=0?'cb':'cr'}" style="font-size:11px">${f>=0?'▲':'▼'}${Math.abs(Math.round(f))}</span></td>
+    <td class="num">${x?'—':`<span class="pbar"><i style="width:${pct(c.qf/N)}%"></i></span>${pct(c.qf/N)}%`}</td><td class="num">${x?'—':pct(c.sf/N)+'%'}</td><td class="num cg">${x?'—':(c.win/N*100).toFixed(1)+'%'}</td></tr>`}).join('')+'</tbody>';
+  // pending
+  $('#wPend').innerHTML=PENDING.map(m=>{const p=pSeries(pGame(m.a,m.b),m.bo||3);const set=W.res[m.id];
+    return`<div class="mt"><div class="tm"><b>${esc(TEAMS[m.a].ab)}</b><span class="muted">${base[m.a].w}-${base[m.a].l}</span><button class="wb${set===m.a?' on':''}" data-m="${m.id}" data-w="${m.a}">${set===m.a?'✓ 승리':'승리 입력'}</button></div>
+    <div class="mid"><span class="num"><span class="${p>=.5?'cb':''}">${pct(p)}</span> : <span class="${p<.5?'cr':''}">${100-pct(p)}</span></span>${m.time}<br>${m.stake}</div>
+    <div class="tm r"><b>${esc(TEAMS[m.b].ab)}</b><span class="muted">${base[m.b].w}-${base[m.b].l}</span><button class="wb${set===m.b?' on':''}" data-m="${m.id}" data-w="${m.b}">${set===m.b?'✓ 승리':'승리 입력'}</button></div></div>`}).join('');
+  $('#wPend').querySelectorAll('.wb').forEach(b=>b.onclick=()=>{const id=b.dataset.m;W.res[id]=W.res[id]===b.dataset.w?undefined:b.dataset.w;if(!W.res[id])delete W.res[id];runWorlds()});
+  const p22=MAIN.filter(t=>base[t].w===2&&base[t].l===2);
+  $('#wR5').innerHTML=`5라운드(2승 2패 6팀 3판 2선승) 대진은 4라운드 종료 후 추첨됩니다. 현재 2승 2패: ${p22.map(t=>TEAMS[t].ab).join(', ')||'—'} + 4라운드 결과에 따라 합류.`;
+  // bracket
+  const nm=t=>esc(TEAMS[t].ab);
+  const used=new Set();
+  const pick=(o,ex)=>{const t=topOf(o,N,12).filter(x=>!ex.has(x.k));return t};
+  const slot=(o,fixed,ex)=>{if(fixed){ex&&ex.add(fixed);return{rows:[{k:fixed,p:1,fix:1}],alt:''}}const t=pick(o,ex||new Set());ex&&ex.add(t[0].k);return{rows:[t[0]],alt:t.slice(1,4).map(x=>`${TEAMS[x.k].ab} ${pct(x.p)}%`).join(' · ')}};
+  const pairBox=(po,to,ex)=>{const t=topOf(po,N,40).find(x=>{const[a,b]=x.k.split('|');return!ex.has(a)&&!ex.has(b)});if(!t)return'';const[a,b]=t.k.split('|');ex.add(a);ex.add(b);const alts=topOf(to,N,8).filter(x=>!ex.has(x.k)).slice(0,3);
+    return`<div class="bm"><div class="bt"><b>${nm(a)}</b><span></span></div><div class="bt"><b>${nm(b)}</b><span></span></div><div class="alt">이 대진 성사 확률 ${pct(t.p)}% · 그 외 후보 ${alts.map(x=>`${TEAMS[x.k].ab}`).join(', ')}</div></div>`};
+  const box=(a,b)=>`<div class="bm">${[a,b].map(s=>`<div class="bt${s.rows[0].fix?' fix':''}"><b>${nm(s.rows[0].k)}</b><span>${s.rows[0].fix?'확정':pct(s.rows[0].p)+'%'}</span></div>`).join('')}${[a,b].some(s=>s.alt)?`<div class="alt">그 외: ${[a.alt,b.alt].filter(Boolean).join(' · ')}</div>`:''}</div>`;
+  const chTop=topOf(S.ch,N,3);
+  const eq=new Set(),es=new Set(),ef=new Set();
+  let q1,q2,q3,q4;
+  if(QF_DRAW){[q1,q2,q3,q4]=QF_DRAW.map(([a,b],i)=>{const w=KO_RESULTS['qf'+(i+1)];return`<div class="bm">${[a,b].map(t=>`<div class="bt fix"><b>${nm(t)}</b><span>${w?(w===t?'승':''):'확정'}</span></div>`).join('')}</div>`})}
+  else{q1=box(slot(null,'GEN',eq),slot(S.qf1b,null,eq));q3=box(slot(null,'DK',eq),slot(S.qf3b,null,eq));q2=pairBox(S.qf2,S.qf2t,eq);q4=pairBox(S.qf2,S.qf2t,eq)}
+  $('#wBracket').innerHTML=`
+    <div class="bcol"><h4>8강</h4><div class="bcb">${q1}${q2}${q3}${q4}</div></div>
+    <div class="bcol"><h4>4강</h4><div class="bcb">${box(slot(S.sf1a,null,es),slot(S.sf1b,null,es))}${box(slot(S.sf2a,null,es),slot(S.sf2b,null,es))}</div></div>
+    <div class="bcol"><h4>결승</h4><div class="bcb">${box(slot(S.fa,null,ef),slot(S.fb,null,ef))}</div></div>
+    <div class="bcol"><h4>우승</h4><div class="bcb"><div class="champ"><span class="lbl">가장 유력</span><b>${nm(chTop[0].k)}</b><span class="num cg">${(chTop[0].p*100).toFixed(1)}%</span><div class="note">${chTop.slice(1).map(x=>`${TEAMS[x.k].ab} ${(x.p*100).toFixed(1)}%`).join(' · ')}</div></div></div></div>`;
+  // odds
+  const od=MAIN.filter(t=>C[t].win>0).sort((a,b)=>C[b].win-C[a].win);const mxw=C[od[0]].win;
+  $('#wOdds').innerHTML=od.map(t=>`<div class="o"><span>${nm(t)}</span><div class="ob"><i style="width:${C[t].win/mxw*100}%"></i></div><span class="num" style="text-align:right">${(C[t].win/N*100).toFixed(1)}%</span></div>`).join('');
+  // match select
+  const opts=PENDING.filter(m=>!W.res[m.id]).map(m=>`<option value="${m.id}">${TEAMS[m.a].ab} vs ${TEAMS[m.b].ab} · ${m.time}</option>`);
+  const qfp=[[ 'GEN',topOf(S.qf1b,N,1)[0]],['DK',topOf(S.qf3b,N,1)[0]]].map(([a,t])=>`<option value="qf:${a}:${t.k}">8강 예상: ${TEAMS[a].ab} vs ${TEAMS[t.k].ab} (${pct(t.p)}%)</option>`);
+  topOf(S.qf2,N,2).forEach(q=>{{const[a,b]=q.k.split('|');qfp.push(`<option value="qf:${a}:${b}">8강 예상: ${TEAMS[a].ab} vs ${TEAMS[b].ab} (${pct(q.p)}%)</option>`)}});
+  const sel=$('#wMatch');const prev=W.match;
+  sel.innerHTML=`<optgroup label="남은 경기">${opts.join('')}</optgroup><optgroup label="8강 예상 대진">${qfp.join('')}</optgroup><option value="custom">직접 고르기…</option>`;
+  if([...sel.options].some(o=>o.value===prev))sel.value=prev;else{sel.selectedIndex=0;W.match=sel.value}
+  $('#wCA').innerHTML=teamSelectHTML(W.ca||'GEN',true);$('#wCB').innerHTML=teamSelectHTML(W.cb||'T1',true);
+  renderMatch();
+}
+function currentMatch(){const v=W.match;
+  if(v==='custom')return{a:$('#wCA').value,b:$('#wCB').value,bo:+$('#wBo').value,label:'가상 대진'};
+  if(v&&v.startsWith('qf:')){const[,a,b]=v.split(':');return{a,b,bo:5,label:'8강 예상'}}
+  const m=PENDING.find(x=>x.id===v)||PENDING[0];if(!m)return{a:'GEN',b:'T1',bo:5,label:'가상 대진'};return{a:m.a,b:m.b,bo:m.bo||3,label:(m.stage==='ko'?'':'스위스 · ')+m.stake}}
+function matchPreview(a,b,bo){
+  const locked=new Set();const games=[];let blue=a;
+  for(let i=0;i<bo;i++){const red=blue===a?b:a;const pb=defaultLineup(blue),pr=defaultLineup(red);
+    const st=aiDraft(pb,pr,locked,hash(a+b)+i*31);const ev=evaluate({pids:pb,picks:st.picks.B},{pids:pr,picks:st.picks.R});
+    const pA=blue===a?ev.p:1-ev.p;games.push({blue,red,st,ev,pA,pb,pr});
+    [...Object.values(st.picks.B),...Object.values(st.picks.R)].forEach(k=>locked.add(k));
+    blue=pA>=.5?b:a;}
+  return games}
+function renderMatch(){
+  const m=currentMatch();const custom=W.match==='custom';$('#wCA').hidden=!custom;$('#wCB').hidden=!custom;
+  if(!custom)$('#wBo').value=String(m.bo);const bo=+$('#wBo').value;
+  if(m.a===m.b){$('#wAnalysis').innerHTML='<p class="muted">서로 다른 두 팀을 고르세요.</p>';return}
+  const games=matchPreview(m.a,m.b,bo);const sd=seriesDist(games.map(g=>g.pA));
+  const fav=sd.pA>=.5?m.a:m.b;const fp=Math.max(sd.pA,1-sd.pA);
+  const mode=sd.scores.slice().sort((x,y)=>y[1]-x[1])[0];
+  const g1=games[0];
+  const pts=watchPoints(g1.ev,{name:AB(g1.blue),tid:g1.blue,pids:g1.pb,picks:g1.st.picks.B},{name:AB(g1.red),tid:g1.red,pids:g1.pr,picks:g1.st.picks.R},{fearless:bo>1,max:10});
+  const gHTML=games.map((g,i)=>{const col=(side,pids)=>{const k=side==='B'?'B':'R';return`<div class="gp${side==='R'?' r':''}"><div class="bnr">${g.st.bans[k].map(x=>ct(x,'sm')).join('')}</div>${ROLES.map((r,j)=>{const c=g.st.picks[k][r];const rec=c?playerRec(pids[j],c):null;return`<div class="row">${ct(c,'sm')}<span><b>${esc(pName(pids[j]))}</b> ${c?esc(CH[c].ko):''}<span class="ps">${c?esc(statShort(c)):''}${rec?` · 선수 ${recTxt(rec)}`:''}</span></span></div>`}).join('')}</div>`};
+    return`<div class="gdraft"><div class="gh"><span class="lbl">${i+1}세트 예상 밴픽${i?' (피어리스)':''}</span><span><span class="cb">블루 ${AB(g.blue)}</span> · <span class="cr">레드 ${AB(g.red)}</span></span>
+      <span class="num"><b class="${g.pA>=.5?'cg':''}">${AB(m.a)} ${pct(g.pA)}%</b></span></div>
+      <div class="gs">${col('B',g.pb)}${col('R',g.pr)}</div>
+      <div class="note">${g.ev.cA.archKo} vs ${g.ev.cB.archKo} · 15분 골드 ${g.ev.gold15>=0?AB(g.blue):AB(g.red)} +${Math.abs(g.ev.gold15).toLocaleString()} 예상 · 예상 ${Math.round(g.ev.time)}분</div></div>`}).join('');
+  $('#wAnalysis').innerHTML=`<div class="wpbar"><div class="b" style="width:${pct(sd.pA)}%">${esc(TEAMS[m.a].ab)} ${pct(sd.pA)}%</div><div class="r" style="width:${100-pct(sd.pA)}%">${100-pct(sd.pA)}% ${esc(TEAMS[m.b].ab)}</div></div>
+    <p style="margin:10px 0"><span class="chip g">${esc(m.label)}</span> <b>${esc(TEAMS[fav].ab)}</b> 우세 ${pct(fp)}% · 가장 유력한 스코어 <b class="num">${mode[0].split('-').map(Number)[0]>mode[0].split('-').map(Number)[1]?TEAMS[m.a].ab:TEAMS[m.b].ab} ${mode[0]}</b> (${pct(mode[1])}%)</p>
+    <div class="tagrow" style="margin-bottom:10px">${sd.scores.map(([s,p])=>{const[x,y]=s.split('-').map(Number);return`<span class="chip ${x>y?'b':'r'}">${x>y?TEAMS[m.a].id:TEAMS[m.b].id} ${s} · ${pct(p)}%</span>`}).join('')}</div>
+    <h4 class="subh">관전 포인트 <small>1세트 예상 밴픽 기준</small></h4>${renderPoints(pts)}<h4 class="subh">세트별 예상 밴픽</h4>${gHTML}`;
+}
+function bindWorlds(){
+  $('#wRun').onclick=runWorlds;
+  $('#wMatch').onchange=e=>{W.match=e.target.value;renderMatch()};
+  $('#wCA').onchange=e=>{W.ca=e.target.value;renderMatch()};$('#wCB').onchange=e=>{W.cb=e.target.value;renderMatch()};
+  $('#wBo').onchange=renderMatch;
+  $('#wToLive').onclick=()=>{const m=currentMatch();L.B={tid:m.a,pids:defaultLineup(m.a)};L.R={tid:m.b,pids:defaultLineup(m.b)};L.locked.clear();$('#liveGame').value='1';resetDraft();renderAllLive();location.hash='#live';window.scrollTo(0,0)};
+}
+
+// =============== boot ===============
+{const st=document.getElementById('stamp');if(st)st.textContent=DATA_STAMP;}
+liveExample();bindLive();renderAllLive();bindVirtual();bindWorlds();bindGame();route();
+</script>
+
+</body>
+</html>
