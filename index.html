@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="롤 실시간 밴픽 승률 예측, 가상 매치 시뮬레이터, 2026 월즈 대진표 예측, 무료 승부예측 챌린지">
+<meta name="description" content="롤 실시간 밴픽 승률 예측, 인게임 실시간 승률, 가상 매치 시뮬레이터, 2026 월즈 대진표 예측, 무료 승부예측 챌린지">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
@@ -64,7 +64,7 @@ h2.vt{font-family:var(--f-disp);font-weight:700;font-size:30px;letter-spacing:.0
 .btn.pri{background:linear-gradient(180deg,#d8bd82,#a8894f);color:#1a1408;border-color:#e9d39c}
 .btn.pri:hover{color:#000}
 .btn:disabled{opacity:.4;cursor:not-allowed}
-select,input[type=search],input[type=text]{background:var(--bg2);border:1px solid var(--line2);border-radius:4px;padding:6px 8px;min-width:0}
+select,input[type=search],input[type=text],input[type=number]{background:var(--bg2);border:1px solid var(--line2);border-radius:4px;padding:6px 8px;min-width:0}
 .chip{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;padding:2px 7px;border-radius:999px;border:1px solid var(--line2);color:var(--muted);white-space:nowrap}
 .chip.g{color:var(--gold2);border-color:rgba(200,170,110,.5);background:var(--goldDim)}
 .chip.b{color:var(--blue);border-color:rgba(75,159,234,.5);background:var(--blueDim)}
@@ -75,7 +75,8 @@ select,input[type=search],input[type=text]{background:var(--bg2);border:1px soli
 .ct{--h:40;display:inline-grid;place-items:center;width:40px;height:40px;border-radius:4px;flex:none;
   background:linear-gradient(150deg,hsl(var(--h) 42% 34%),hsl(var(--h) 48% 13%));border:1px solid hsl(var(--h) 40% 46%);
   color:var(--gold2);font-weight:700;font-size:14px;letter-spacing:-.02em;box-shadow:inset 0 0 0 1px rgba(0,0,0,.35);position:relative;overflow:hidden}
-.ct::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.12),transparent 45%)}
+.ct::after{content:"";position:absolute;inset:0;z-index:2;background:linear-gradient(180deg,rgba(255,255,255,.12),transparent 45%);pointer-events:none}
+.ct img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;transform:scale(1.08)}
 .ct.sm{width:28px;height:28px;font-size:11px}
 .ct.lg{width:56px;height:56px;font-size:19px}
 .ct.xl{width:64px;height:64px;font-size:21px}
@@ -107,6 +108,13 @@ select,input[type=search],input[type=text]{background:var(--bg2);border:1px soli
 .phase .p1{font-family:var(--f-disp);font-size:13px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
 .phase .p2{font-weight:700;font-size:15px}
 .phase .tm{font-family:var(--f-disp);font-size:30px;font-weight:700;line-height:1;color:var(--gold2)}
+.order{display:flex;flex-wrap:wrap;gap:3px;align-items:center;padding:8px 16px;border-bottom:1px solid var(--line);font-size:11px}
+.order .os{padding:2px 6px;border-radius:3px;border:1px solid var(--line);color:var(--dim);white-space:nowrap}
+.order .os.pick{font-weight:700}
+.order .os.b.pick{color:var(--blue)} .order .os.r.pick{color:var(--red)}
+.order .os.done{opacity:.4;text-decoration:line-through}
+.order .os.now{opacity:1;color:#1a1408;background:var(--gold);border-color:var(--gold);text-decoration:none}
+.order .og{width:10px}
 .bans{display:flex;justify-content:space-between;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .bans .bs{display:flex;gap:6px;align-items:center}
 .bans .bs .gap{width:10px}
@@ -236,7 +244,9 @@ table.st tr.q td{background:rgba(82,192,141,.06)} table.st tr.x td{opacity:.45}
 .bm .bt:last-child{border-bottom:0}
 .bm .bt.fix b{color:var(--gold2)}
 .bm .bt span{font-family:var(--f-disp);color:var(--muted)}
-.bm .alt{font-size:10.5px;color:var(--dim);padding:0 8px 5px;margin-top:-3px}
+.bm .alt{font-size:11px;line-height:1.45;color:var(--muted);padding:4px 8px 6px;border-bottom:1px solid var(--line);white-space:normal;overflow-wrap:anywhere}
+.bm .alt:last-child{border-bottom:0}
+.bm .alt b{color:var(--gold);font-weight:600}
 .champ{border:1px solid var(--gold);background:linear-gradient(180deg,var(--goldDim),transparent);padding:12px;border-radius:4px;text-align:center}
 .champ b{font-family:var(--f-disp);font-size:24px;color:var(--gold2);display:block}
 .odds{display:flex;flex-direction:column;gap:6px}
@@ -287,6 +297,37 @@ table.st tr.q td{background:rgba(82,192,141,.06)} table.st tr.x td{opacity:.45}
 .gh-row.ok{border-left-color:var(--good)} .gh-row.no{border-left-color:var(--red)}
 .gh-row b{text-align:right}
 table.st tr.me td{background:var(--goldDim)}
+.igcard{margin-top:14px;border-top:3px solid var(--gold)}
+.igtop{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:12px}
+.igtop label,.igobj label{display:flex;flex-direction:column;gap:3px;font-size:11.5px;color:var(--muted)}
+.igtop input{width:130px;padding:7px 8px}
+.igq{display:flex;gap:4px}
+.gdbox{display:flex;flex-direction:column;gap:3px;font-size:11.5px;color:var(--muted)}
+.gdrow{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.gdrow input{width:120px;padding:7px 8px}
+.seg{display:inline-flex;border:1px solid var(--line2);border-radius:4px;overflow:hidden}
+.seg button{background:var(--bg2);border:0;padding:7px 10px;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer}
+.seg button+button{border-left:1px solid var(--line2)}
+.seg button.on.b{background:var(--blue);color:#06121f}
+.seg button.on.r{background:var(--red);color:#1d0605}
+.igcols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.igs{background:var(--bg2);border:1px solid var(--line);border-radius:4px;padding:10px;min-width:0;border-top:3px solid var(--blue)}
+.igs.r{border-top-color:var(--red)}
+.igs-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.igs-h b{font-family:var(--f-disp);font-size:20px;letter-spacing:.05em}
+.igobj{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:10px}
+.igobj input{width:100%;padding:5px 6px}
+.igobj label.ck{flex-direction:row;align-items:center;gap:6px;grid-column:span 3;font-size:12.5px;color:var(--text)}
+.igobj label.ck input{width:auto}
+table.igk{width:100%;border-collapse:collapse;font-size:12.5px}
+table.igk th{font-size:10.5px;color:var(--muted);text-align:left;padding:3px 4px;font-weight:600}
+table.igk td{padding:3px 4px;border-top:1px solid var(--line)}
+table.igk td:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+table.igk input{width:46px;padding:4px 5px}
+.igout2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+ul.drv{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+ul.drv li{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;padding:5px 8px;background:var(--bg2);border-radius:3px}
+#igOut{margin-top:14px}
 footer{border-top:1px solid var(--line);padding-block:20px;color:var(--muted);font-size:12px}
 footer .wrap{display:flex;flex-direction:column;gap:6px}
 footer a{color:var(--gold)}
@@ -316,6 +357,11 @@ footer a{color:var(--gold)}
   .stamp{margin-left:0;font-size:11px}
   header.top{position:static}
   .vrow{grid-template-columns:40px minmax(0,1fr)}
+  .igcols,.igout2{grid-template-columns:1fr}
+  .bracket{grid-template-columns:1fr;min-width:0;gap:16px}
+  .bcol h4{text-align:left}
+  .bcb{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+  .igtop input{width:110px}
   .vrow .rk{grid-column:2;margin-top:-4px}
   .brand span{display:none}
   .pk{min-height:64px}
@@ -361,6 +407,7 @@ footer a{color:var(--gold)}
       <div class="phase"><div class="p1" id="phase1">BAN PHASE 1</div><div class="p2" id="phase2">블루 1밴</div><div class="tm num" id="timer">30</div></div>
       <div class="tn r"><span class="wp cr num" id="wpR">50%</span><div><b class="cr" id="bhR">RED</b><small id="bhRs">레드 진영</small></div></div>
     </div>
+    <div class="order" id="order" aria-label="밴픽 순서"></div>
     <div class="bans"><div class="bs" id="bansB"></div><div class="bs" id="bansR"></div></div>
     <div class="bmain">
       <div class="picks" id="picksB"></div>
@@ -387,6 +434,12 @@ footer a{color:var(--gold)}
       </div>
       <div class="picks red" id="picksR"></div>
     </div>
+  </div>
+
+  <div class="card igcard">
+    <h3>인게임 실시간 승률 <small>밴픽이 끝나면 경기 시간·킬뎃·오브젝트를 수시로 입력하세요</small></h3>
+    <div id="igForm"></div>
+    <div id="igOut"></div>
   </div>
 
   <div class="deck">
@@ -511,6 +564,7 @@ footer a{color:var(--gold)}
 <footer>
   <div class="wrap">
     <div>경기 결과·로스터: LoL Esports 공식 결과와 Leaguepedia, Liquipedia, GosuGamers, 인벤, OSEN, 스포츠경향 보도 (10/29 오전 기준). 챔피언 픽·밴 기록: 월즈 2026 플레이인+스위스 53경기 집계(lolworlds2026.com, nerfplz.com).</div>
+    <div>리프트 오라클은 Riot Games가 보증하지 않는 팬 사이트입니다. League of Legends와 챔피언 이미지는 Riot Games의 상표 및 저작물이며, 이미지는 Community Dragon을 통해 불러옵니다.</div>
     <div>선수 레이팅, 챔피언 숙련도, 시간대별 승률은 2026 시즌·국제전 성적을 바탕으로 한 자체 추정 모델입니다. 실제 결과와 다를 수 있으며 베팅 용도가 아닙니다. LoL 대회 시즌 개막 로스터를 쓴 비월즈 팀은 시즌 중 변동이 있을 수 있습니다.</div>
   </div>
 </footer>
@@ -1046,7 +1100,10 @@ function simGame(ev,rnd,log){
 // ===================== UI =====================
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function ct(key,cls){if(!key)return`<span class="ct empty ${cls||''}">?</span>`;const c=CH[key];return`<span class="ct ${cls||''}" style="--h:${CLS_H[c.cls]}" title="${esc(c.ko)} · ${esc(statShort(key))}">${esc(c.ab)}</span>`}
+const champImg=k=>`https://cdn.communitydragon.org/latest/champion/${k==='LeBlanc'?'Leblanc':k}/square`;
+function ct(key,cls){if(!key)return`<span class="ct empty ${cls||''}">?</span>`;const c=CH[key];return`<span class="ct ${cls||''}" style="--h:${CLS_H[c.cls]}" title="${esc(c.ko)} · ${esc(statShort(key))}">${esc(c.ab)}<img src="${champImg(key)}" alt="" loading="lazy" decoding="async"></span>`}
+// If an image can't load (offline, or a host that blocks external images), fall back to the two-letter tile.
+document.addEventListener('error',e=>{const t=e.target;if(t&&t.tagName==='IMG'&&t.parentNode&&t.parentNode.classList&&t.parentNode.classList.contains('ct'))t.remove()},true);
 const AB=id=>TEAMS[id].ab;
 const pName=pid=>PLAYERS[pid].name;
 const sideCls=p=>p>=0.5?'cb':'cr';
@@ -1167,6 +1224,8 @@ function renderBoard(ev){
   const [p1,p2]=phaseLabel();$('#phase1').textContent=p1;$('#phase2').textContent=p2+(L.example?' · AI 예시':'');
   $('#timer').textContent=L.timerOn?L.tleft:'—';$('#timer').style.color=L.timerOn&&L.tleft<=5?'var(--red)':'';
   const st=SEQ[L.step];
+  {const cnt={};$('#order').innerHTML=SEQ.map((x,i)=>{const k=x.s+x.t;cnt[k]=(cnt[k]||0)+1;const lab=`${x.s==='B'?'블루':'레드'} ${cnt[k]}${x.t==='ban'?'밴':'픽'}`;
+    const gap=(i===6||i===12||i===16)?'<span class="og"></span>':'';return`${gap}<span class="os ${x.s==='B'?'b':'r'} ${x.t}${i<L.step?' done':''}${i===L.step?' now':''}">${lab}</span>`}).join('')}
   ['B','R'].forEach(side=>{
     const bans=L.bans[side];let h='';
     for(let i=0;i<5;i++){const k=bans[i];const act=st&&st.t==='ban'&&st.s===side&&i===bans.length;
@@ -1281,15 +1340,15 @@ function renderLive(){
   syncSetup('B');syncSetup('R');
   const ev=liveEval();
   L.wp=L.wp.filter(p=>p.s<L.step);L.wp.push({s:L.step,p:ev.p});
-  renderBoard(ev);renderReco();renderAnalysis(ev)}
+  renderBoard(ev);renderReco();renderAnalysis(ev);if(typeof renderIG==='function'){syncIGNames();renderIG()}}
 function renderAllLive(){buildSetup('B');buildSetup('R');renderLive()}
-function resetDraft(){L.step=0;L.bans={B:[],R:[]};L.picks={B:{},R:{}};L.manual={B:false,R:false};L.hist=[];L.wp=[];L.sel=null;L.tleft=30;L.example=false}
+function resetDraft(){if(typeof igBlank==='function'){L.ig=igBlank();if($('#igForm'))buildIG()}L.step=0;L.bans={B:[],R:[]};L.picks={B:{},R:{}};L.manual={B:false,R:false};L.hist=[];L.wp=[];L.sel=null;L.tleft=30;L.example=false}
 function bindLive(){
   $('#roleFilter').querySelectorAll('button').forEach(b=>b.onclick=()=>{L.roleF=b.dataset.r;$('#roleFilter').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));renderBoard(liveEval())});
   $('#champSearch').oninput=e=>{L.q=e.target.value;renderBoard(liveEval())};
   $('#bUndo').onclick=()=>{if(!L.hist.length)return;restore(L.hist.pop());L.sel=null;renderLive()};
   $('#bReset').onclick=()=>{resetDraft();renderLive()};
-  $('#bSwap').onclick=()=>{[L.B,L.R]=[L.R,L.B];[L.bans.B,L.bans.R]=[L.bans.R,L.bans.B];[L.picks.B,L.picks.R]=[L.picks.R,L.picks.B];[L.manual.B,L.manual.R]=[L.manual.R,L.manual.B];L.wp=[];renderAllLive()};
+  $('#bSwap').onclick=()=>{[L.B,L.R]=[L.R,L.B];[L.bans.B,L.bans.R]=[L.bans.R,L.bans.B];[L.picks.B,L.picks.R]=[L.picks.R,L.picks.B];[L.manual.B,L.manual.R]=[L.manual.R,L.manual.B];L.wp=[];L.ig=igBlank();buildIG();renderAllLive()};
   $('#bAuto').onclick=()=>{const rnd=mulberry(Date.now());L.hist.push(snapshot());L.example=false;
     while(L.step<20){const st=SEQ[L.step];const k=aiStep(liveState(),st,L.B.pids,L.R.pids,L.locked,rnd);if(!k)break;
       if(st.t==='ban')L.bans[st.s].push(k);else if(L.manual[st.s]){const r=bestRole(L[st.s].pids,L.picks[st.s],k);if(r)L.picks[st.s][r]=k}else L.picks[st.s]=reassign(L[st.s].pids,[...Object.values(L.picks[st.s]),k]);
@@ -1466,6 +1525,81 @@ function bindGame(){
   document.querySelectorAll('#gRankTabs button').forEach(b=>b.onclick=()=>{G.rk=b.dataset.k;renderGame()});
   setInterval(()=>{if(!$('#v-game').hidden&&G.me)renderGame()},60000);
 }
+// =============== IN-GAME LIVE TRACKER (after the draft) ===============
+const OBJ=[['tw','파괴한 포탑',11],['inh','파괴한 억제기',3],['dr','처치한 드래곤',6],['gr','처치한 유충',6],['her','처치한 전령',1],['bar','처치한 바론',3]];
+function igBlank(){const t={tw:0,inh:0,dr:0,gr:0,her:0,bar:0,baronBuff:false,elder:false};return{t:0,gd:'',gdSide:1,B:{...t},R:{...t},kda:{B:ROLES.map(()=>[0,0,0]),R:ROLES.map(()=>[0,0,0])},hist:[]}}
+L.ig=igBlank();
+const logit=x=>Math.log(x/(1-x));
+function igEval(ev){
+  const g=L.ig,t=Math.max(0,+g.t||0);
+  const sum=s=>g.kda[s].reduce((a,x)=>[a[0]+x[0],a[1]+x[1],a[2]+x[2]],[0,0,0]);
+  const kb=sum('B'),kr=sum('R'),B=g.B,R=g.R,d=k=>B[k]-R[k];
+  const est=(kb[0]-kr[0])*300+(kb[2]-kr[2])*40+d('tw')*650+d('inh')*300+d('dr')*150+d('gr')*100+d('her')*300+d('bar')*1500;
+  const manual=g.gd!==''&&!isNaN(+g.gd);const gd=manual?(g.gdSide||1)*Math.abs(+g.gd):Math.round(est/50)*50;
+  // pre-game prior: early-game edge fades into late-game edge as the clock runs, and matters less once the map state is known
+  const a=clamp(t/30,0,1);const prior=0.5*logit(ev.p)+0.5*((1-a)*logit(ev.pE)+a*logit(ev.pL));const w=Math.max(0.3,1-t/40);
+  const parts=[];const add=(lab,z)=>{if(Math.abs(z)>0.005)parts.push({lab,z})};
+  add('밴픽·선수 기대치'+(t>=25?' (후반 성향 반영)':t>0?'':''),prior*w);
+  add(gd===0?'골드 차 없음':`골드 차 ${gd>0?AB(L.B.tid):AB(L.R.tid)} +${(Math.abs(gd)/1000).toFixed(1)}k${manual?'':' (추정)'}`,gd/(715+165*Math.max(t,3)));
+  add(`드래곤 ${B.dr}:${R.dr}`,d('dr')*0.1);
+  const soul=(B.dr>=4?0.8:0)-(R.dr>=4?0.8:0);add(soul>0?'블루 드래곤 영혼':'레드 드래곤 영혼',soul);
+  add('장로 버프',(B.elder?1.3:0)-(R.elder?1.3:0));
+  add('바론 버프',(B.baronBuff?0.8:0)-(R.baronBuff?0.8:0));
+  add(`파괴한 억제기 ${B.inh}:${R.inh}`,d('inh')*0.35);
+  add(`파괴한 포탑 ${B.tw}:${R.tw}`,d('tw')*0.05);
+  add(`유충·전령`,(d('gr')+d('her'))*0.04);
+  const z=parts.reduce((s,p)=>s+p.z,0);
+  return{p:1/(1+Math.exp(-z)),parts,gd,manual,est,kb,kr,t}}
+function buildIG(){
+  const box=$('#igForm');if(!box)return;
+  const side=s=>`<div class="igs ${s==='B'?'b':'r'}"><div class="igs-h"><b id="igName${s}">${AB(L[s].tid)}</b><span class="muted">${s==='B'?'블루':'레드'} · 이 팀이 얻은 수치</span></div>
+    <div class="igobj">${OBJ.map(([k,lab,mx])=>`<label>${lab}<input type="number" inputmode="numeric" min="0" max="${mx}" id="ig${s}_${k}" data-s="${s}" data-k="${k}" value="${L.ig[s][k]}"></label>`).join('')}
+      <label class="ck"><input type="checkbox" id="ig${s}_baronBuff" data-s="${s}" data-k="baronBuff"${L.ig[s].baronBuff?' checked':''}> 바론 버프 중</label>
+      <label class="ck"><input type="checkbox" id="ig${s}_elder" data-s="${s}" data-k="elder"${L.ig[s].elder?' checked':''}> 장로 버프 중</label></div>
+    <table class="igk"><thead><tr><th>선수</th><th>K</th><th>D</th><th>A</th></tr></thead><tbody>${ROLES.map((r,i)=>`<tr><td><span class="lbl">${ROLE_KO[r]}</span> <b id="igP${s}${i}">${esc(pName(L[s].pids[i]))}</b></td>${[0,1,2].map(j=>`<td><input type="number" inputmode="numeric" min="0" max="60" id="igK${s}${i}${j}" data-s="${s}" data-i="${i}" data-j="${j}" value="${L.ig.kda[s][i][j]}" aria-label="${ROLE_KO[r]} ${'KDA'[j]}"></td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  box.innerHTML=`<div class="igtop"><label>경기 시간(분)<input type="number" inputmode="numeric" min="0" max="70" id="igT" value="${L.ig.t}"></label>
+    <div class="igq"><button class="btn" data-dt="1">+1분</button><button class="btn" data-dt="5">+5분</button></div>
+    <div class="gdbox"><span>골드 차 (비우면 자동 추정)</span><div class="gdrow"><div class="seg" id="igSeg" role="group" aria-label="골드가 앞선 팀"><button type="button" data-gs="1" class="b${L.ig.gdSide===1?' on':''}">${AB(L.B.tid)} 앞섬</button><button type="button" data-gs="-1" class="r${L.ig.gdSide===-1?' on':''}">${AB(L.R.tid)} 앞섬</button></div><input type="number" inputmode="numeric" min="0" step="100" id="igGD" placeholder="예: 2500" aria-label="골드 차이" value="${L.ig.gd}"></div></div>
+    <button class="btn pri" id="igSave">현재 상태 기록</button><button class="btn" id="igReset">인게임 초기화</button></div>
+    <div class="igcols">${side('B')}${side('R')}</div>`;
+  box.oninput=e=>{const el=e.target;if(el.id==='igT'){L.ig.t=Math.max(0,+el.value||0)}else if(el.id==='igGD'){let v=el.value.trim();if(v.startsWith('-')){v=v.slice(1);L.ig.gdSide=-1;el.value=v;syncSeg()}L.ig.gd=v}
+    else if(el.dataset.i!==undefined){L.ig.kda[el.dataset.s][+el.dataset.i][+el.dataset.j]=Math.max(0,+el.value||0)}
+    else if(el.dataset.k){const k=el.dataset.k;L.ig[el.dataset.s][k]=el.type==='checkbox'?el.checked:Math.max(0,+el.value||0)}
+    renderIG()};
+  box.onchange=box.oninput;
+  $('#igSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{L.ig.gdSide=+b.dataset.gs;syncSeg();renderIG()});
+  box.querySelectorAll('.igq button').forEach(b=>b.onclick=()=>{L.ig.t=(+L.ig.t||0)+ +b.dataset.dt;$('#igT').value=L.ig.t;saveIG();renderIG()});
+  $('#igSave').onclick=()=>{saveIG();renderIG()};
+  $('#igReset').onclick=()=>{L.ig=igBlank();buildIG();renderIG()};
+}
+function syncSeg(){const sg=$('#igSeg');if(!sg)return;sg.querySelectorAll('button').forEach(b=>b.classList.toggle('on',+b.dataset.gs===L.ig.gdSide));sg.children[0].textContent=AB(L.B.tid)+' 앞섬';sg.children[1].textContent=AB(L.R.tid)+' 앞섬'}
+function saveIG(){const r=igEval(liveEval());const h=L.ig.hist.filter(x=>x.t!==r.t);h.push({t:r.t,p:r.p});h.sort((a,b)=>a.t-b.t);L.ig.hist=h}
+function syncIGNames(){syncSeg();['B','R'].forEach(s=>{const n=$('#igName'+s);if(n)n.textContent=AB(L[s].tid);ROLES.forEach((r,i)=>{const e=$(`#igP${s}${i}`);if(e)e.textContent=pName(L[s].pids[i])})})}
+function renderIG(){
+  const out=$('#igOut');if(!out)return;const ev=liveEval();const r=igEval(ev);const A=AB(L.B.tid),B=AB(L.R.tid);
+  const pB=pct(r.p),delta=pct(r.p)-pct(ev.p);
+  const top=r.parts.slice().sort((a,b)=>Math.abs(b.z)-Math.abs(a.z));
+  const kda=s=>L.ig.kda[s].map((x,i)=>{const tk=(s==='B'?r.kb:r.kr)[0];return{p:PLAYERS[L[s].pids[i]],r:ROLES[i],k:x[0],d:x[1],a:x[2],kp:tk?(x[0]+x[2])/tk:0,ratio:(x[0]+x[2])/Math.max(1,x[1])}});
+  const all=[...kda('B').map(x=>({...x,s:'B'})),...kda('R').map(x=>({...x,s:'R'}))];
+  const star=all.filter(x=>x.k+x.a>0).sort((a,b)=>(b.k*2+b.a-b.d*1.5)-(a.k*2+a.a-a.d*1.5))[0];
+  // chart: draft prob at 0, then saved points, then current
+  const pts=[{t:0,p:ev.p},...L.ig.hist.filter(h=>h.t>0)];if(!pts.some(h=>h.t===r.t))pts.push({t:r.t,p:r.p});pts.sort((a,b)=>a.t-b.t);
+  const W=320,H=120,mt=Math.max(30,...pts.map(x=>x.t));const x=t=>24+t/mt*(W-34),y=p=>8+(1-p)*(H-26);
+  let svg=`<line x1="24" x2="${W-10}" y1="${y(.5)}" y2="${y(.5)}" stroke="var(--line2)" stroke-dasharray="3 3"/><text x="20" y="${y(.5)+3}" fill="var(--muted)" font-size="9" text-anchor="end">50%</text>`;
+  for(let m=10;m<=mt;m+=10)svg+=`<text x="${x(m)}" y="${H-4}" fill="var(--muted)" font-size="9" text-anchor="middle">${m}분</text>`;
+  const d=pts.map((q,i)=>`${i?'L':'M'}${x(q.t).toFixed(1)} ${y(q.p).toFixed(1)}`).join(' ');
+  svg+=`<path d="${d} L${x(pts[pts.length-1].t).toFixed(1)} ${y(.5)} L24 ${y(.5)}Z" fill="var(--blueDim)"/><path d="${d}" fill="none" stroke="var(--gold)" stroke-width="2"/>`+pts.map(q=>`<circle cx="${x(q.t)}" cy="${y(q.p)}" r="2.6" fill="var(--gold2)"/>`).join('');
+  out.innerHTML=`<div class="wpbar"><div class="b" style="width:${pB}%">${A} ${pB}%</div><div class="r" style="width:${100-pB}%">${100-pB}% ${B}</div></div>
+    <div class="kv" style="margin-top:10px">
+      <div><b class="num">${r.t}분</b><span>경기 시간</span></div>
+      <div><b class="num ${delta>=0?'cb':'cr'}">${delta>=0?'+':''}${delta}%p</b><span>밴픽 예측(${pct(ev.p)}%) 대비 블루</span></div>
+      <div><b class="num ${r.gd>=0?'cb':'cr'}">${r.gd===0?'0':`${r.gd>0?A:B} +${Math.abs(r.gd).toLocaleString()}`}</b><span>골드 차 ${r.manual?'(입력값)':'(킬·오브젝트로 추정)'}</span></div>
+      <div><b class="num">${r.kb[0]} : ${r.kr[0]}</b><span>킬 스코어</span></div></div>
+    <div class="igout2"><div><div class="lbl" style="margin:12px 0 6px">승률을 움직인 요인</div><ul class="drv">${top.slice(0,6).map(p=>`<li><span>${esc(p.lab)}</span><b class="num ${p.z>=0?'cb':'cr'}">${p.z>=0?A:B} ${p.z>=0?'+':'−'}${Math.abs(p.z).toFixed(2)}</b></li>`).join('')||'<li class="muted">아직 입력된 인게임 정보가 없습니다.</li>'}</ul>
+      ${star?`<p class="note"><b class="${star.s==='B'?'cb':'cr'}">${esc(star.p.name)}</b> ${star.k}/${star.d}/${star.a} · 킬 관여 ${pct(star.kp)}% — 지금 가장 영향력이 큰 선수.</p>`:''}</div>
+      <div><div class="lbl" style="margin:12px 0 6px">시간대별 승률 (블루)</div><svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto" role="img" aria-label="경기 시간에 따른 블루 승률">${svg}</svg>
+      <p class="note">‘현재 상태 기록’이나 +1·+5분 버튼을 누르면 그래프에 점이 찍힙니다.</p></div></div>`;
+}
 // =============== 3. WORLDS ===============
 const W={res:{},sim:null,ran:false,match:'r4b'};
 const MAIN=TEAM_ORDER.filter(t=>TEAMS[t].worlds===1);
@@ -1529,8 +1663,8 @@ function runWorlds(){
   const pick=(o,ex)=>{const t=topOf(o,N,12).filter(x=>!ex.has(x.k));return t};
   const slot=(o,fixed,ex)=>{if(fixed){ex&&ex.add(fixed);return{rows:[{k:fixed,p:1,fix:1}],alt:''}}const t=pick(o,ex||new Set());ex&&ex.add(t[0].k);return{rows:[t[0]],alt:t.slice(1,4).map(x=>`${TEAMS[x.k].ab} ${pct(x.p)}%`).join(' · ')}};
   const pairBox=(po,to,ex)=>{const t=topOf(po,N,40).find(x=>{const[a,b]=x.k.split('|');return!ex.has(a)&&!ex.has(b)});if(!t)return'';const[a,b]=t.k.split('|');ex.add(a);ex.add(b);const alts=topOf(to,N,8).filter(x=>!ex.has(x.k)).slice(0,3);
-    return`<div class="bm"><div class="bt"><b>${nm(a)}</b><span></span></div><div class="bt"><b>${nm(b)}</b><span></span></div><div class="alt">이 대진 성사 확률 ${pct(t.p)}% · 그 외 후보 ${alts.map(x=>`${TEAMS[x.k].ab}`).join(', ')}</div></div>`};
-  const box=(a,b)=>`<div class="bm">${[a,b].map(s=>`<div class="bt${s.rows[0].fix?' fix':''}"><b>${nm(s.rows[0].k)}</b><span>${s.rows[0].fix?'확정':pct(s.rows[0].p)+'%'}</span></div>`).join('')}${[a,b].some(s=>s.alt)?`<div class="alt">그 외: ${[a.alt,b.alt].filter(Boolean).join(' · ')}</div>`:''}</div>`;
+    return`<div class="bm"><div class="bt"><b>${nm(a)}</b><span></span></div><div class="bt"><b>${nm(b)}</b><span></span></div><div class="alt"><b>이 대진 성사 확률 ${pct(t.p)}%</b>${alts.length?`<br>다른 후보 · ${alts.map(x=>TEAMS[x.k].ab).join(', ')}`:''}</div></div>`};
+  const box=(a,b)=>`<div class="bm">${[a,b].map(s=>`<div class="bt${s.rows[0].fix?' fix':''}"><b>${nm(s.rows[0].k)}</b><span>${s.rows[0].fix?'확정':pct(s.rows[0].p)+'%'}</span></div>${s.alt?`<div class="alt">다른 후보 · ${s.alt}</div>`:''}`).join('')}</div>`;
   const chTop=topOf(S.ch,N,3);
   const eq=new Set(),es=new Set(),ef=new Set();
   let q1,q2,q3,q4;
@@ -1595,7 +1729,7 @@ function bindWorlds(){
 
 // =============== boot ===============
 {const st=document.getElementById('stamp');if(st)st.textContent=DATA_STAMP;}
-liveExample();bindLive();renderAllLive();bindVirtual();bindWorlds();bindGame();route();
+liveExample();bindLive();buildIG();renderAllLive();bindVirtual();bindWorlds();bindGame();route();
 </script>
 
 </body>
