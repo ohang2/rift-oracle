@@ -464,7 +464,7 @@ footer a{color:var(--gold)}
     <div class="card s12">
       <h3>밴픽 챔피언 기록 <small>월즈 2026 픽률·밴률·승률 + 선수의 이번 대회 해당 챔피언 성적</small></h3>
       <div id="draftTable"></div>
-      <div class="note">대회 기록: 플레이인+스위스 53경기 집계(10/27). 승률은 집계처가 공개한 챔피언만 표시합니다. 선수 기록: 경기별 보도로 챔피언과 승패가 확인된 경기만 반영했고, 그 외는 ‘첫 사용’으로 표시됩니다.</div>
+      <div class="note">대회 기록: 플레이인+스위스 61경기 집계(10/30). 승률은 집계처가 공개한 챔피언만 표시합니다. 선수 기록: 경기별 보도로 챔피언과 승패가 확인된 경기만 반영했고, 그 외는 ‘첫 사용’으로 표시됩니다.</div>
     </div>
     <div class="card s12">
       <h3>메타 해석 · 조합 분석 <small>월즈 2026 플레이인+스위스 기록 기준</small></h3>
@@ -563,7 +563,7 @@ footer a{color:var(--gold)}
 
 <footer>
   <div class="wrap">
-    <div>경기 결과·로스터: LoL Esports 공식 결과와 Leaguepedia, Liquipedia, GosuGamers, 인벤, OSEN, 스포츠경향 보도 (10/29 오전 기준). 챔피언 픽·밴 기록: 월즈 2026 플레이인+스위스 53경기 집계(lolworlds2026.com, nerfplz.com).</div>
+    <div>경기 결과·로스터: LoL Esports 공식 결과와 Leaguepedia, Liquipedia, GosuGamers, 인벤, OSEN, 스포츠경향, 쿠키뉴스 보도 (10/30 오전 기준). 챔피언 픽·밴 기록: 월즈 2026 플레이인+스위스 61경기 집계(lolworlds2026.com, nerfplz.com).</div>
     <div>리프트 오라클은 Riot Games가 보증하지 않는 팬 사이트입니다. League of Legends와 챔피언 이미지는 Riot Games의 상표 및 저작물이며, 이미지는 Community Dragon을 통해 불러옵니다.</div>
     <div>선수 레이팅, 챔피언 숙련도, 시간대별 승률은 2026 시즌·국제전 성적을 바탕으로 한 자체 추정 모델입니다. 실제 결과와 다를 수 있으며 베팅 용도가 아닙니다. LoL 대회 시즌 개막 로스터를 쓴 비월즈 팀은 시즌 중 변동이 있을 수 있습니다.</div>
   </div>
@@ -760,13 +760,14 @@ CH_RAW.trim().split('\n').forEach(line=>{
   CH[key]=c; CH_LIST.push(c);
 });
 // Worlds 2026 pick/ban record (Play-In + Swiss, 53 games, collected ~Oct 27). w = wins where reported.
-const META_GAMES = 53;
+const META_GAMES = 61; // Play-In + Swiss through 10/30 morning (lolworlds2026.com). w = wins out of wp picks where a win rate was published.
 const META = {
-  LeeSin:{p:18},Ezreal:{p:16,b:17},JarvanIV:{p:16},Rumble:{p:15},Alistar:{p:14,w:4},Ambessa:{p:14,w:8},KSante:{p:14},
-  Jhin:{p:13,w:8},Qiyana:{p:13,b:18,w:7},Orianna:{p:13,w:8},Syndra:{p:12,b:21,w:7},Nautilus:{p:12,w:8},Akali:{p:12,b:16,w:3},
-  Kalista:{p:12},Renata:{p:12,b:20},Lulu:{p:12,w:5},Vi:{p:11,b:31,w:7},Olaf:{p:10,b:24,w:6},Viktor:{p:10},Nocturne:{p:10,b:40},
-  Cassiopeia:{p:7,b:29,w:6},Locke:{p:9,b:17},Seraphine:{p:9,b:16},Jayce:{p:7,b:13},Camille:{p:5},MonkeyKing:{p:7},Lucian:{p:9},
-  Yunara:{p:9},Kaisa:{p:7},Karma:{p:8},Gnar:{p:5,w:3},Jax:{p:5,w:2},Renekton:{p:3,w:2},Caitlyn:{p:4,w:1}
+  LeeSin:{p:20},Ezreal:{p:18,b:19},JarvanIV:{p:18},Rumble:{p:17},Alistar:{p:17,w:4,wp:14},Ambessa:{p:16,w:8,wp:14},KSante:{p:16},
+  Nautilus:{p:15,w:8,wp:12},Jhin:{p:15,w:8,wp:13},Lulu:{p:15,w:5,wp:12},Qiyana:{p:15,b:20,w:7,wp:13},Orianna:{p:15,w:8,wp:13},
+  Syndra:{p:14,b:24,w:7,wp:12},Kalista:{p:13},Renata:{p:13,b:27},Vi:{p:13,b:33,w:7,wp:11},Akali:{p:12,b:21,w:3,wp:12},Viktor:{p:12},
+  Jayce:{p:11,b:16},Lucian:{p:11},Yunara:{p:11},Olaf:{p:11,b:27,w:6,wp:10},Nocturne:{p:11,b:45},Locke:{p:10,b:20},Karma:{p:10},
+  Cassiopeia:{p:7,b:35,w:6,wp:7},Seraphine:{p:9,b:17},Camille:{p:5},MonkeyKing:{p:7},Kaisa:{p:7},
+  Gnar:{p:5,w:3,wp:5},Jax:{p:5,w:2,wp:5},Renekton:{p:3,w:2,wp:3},Caitlyn:{p:4,w:1,wp:4}
 };
 
 // Teams. players: [id, role, rating, pool(optional, comma list), sub?]
@@ -812,22 +813,20 @@ const REGION = {LCK:'KR',LPL:'CN',LEC:'EU',LCS:'NA',LCP:'AP',CBLOL:'BR'};
 
 // ==== LIVE DATA START ====
 // Updated by the scheduled results refresh. Everything the site needs to reflect new results lives in this block.
-const DATA_STAMP = '2026.10.29 10:50 KST';
+const DATA_STAMP = '2026.10.30 10:15 KST';
 // Worlds 2026 Swiss results [winner, loser, winnerGames, loserGames, round]
 const SWISS = [
  ['GEN','IG',1,0,1],['HLE','TES',1,0,1],['MKOI','BLG',1,0,1],['KC','AL',1,0,1],['DK','G2',1,0,1],['CFO','TL',1,0,1],['T1','LOS',1,0,1],['LYON','TSW',1,0,1],
  ['DK','T1',1,0,2],['MKOI','CFO',1,0,2],['GEN','HLE',1,0,2],['LYON','KC',1,0,2],['G2','LOS',1,0,2],['IG','TSW',1,0,2],['TES','AL',1,0,2],['BLG','TL',1,0,2],
  ['DK','MKOI',2,0,3],['GEN','LYON',2,1,3],['IG','HLE',1,0,3],['TES','G2',1,0,3],['T1','CFO',1,0,3],['BLG','KC',1,0,3],['LOS','TSW',2,0,3],['TL','AL',2,0,3],
- ['T1','MKOI',2,0,4],['IG','LYON',2,1,4],
+ ['T1','MKOI',2,0,4],['IG','LYON',2,1,4],['KC','CFO',2,0,4],['TES','BLG',2,1,4],
 ];
 const PENDING = [
- {id:'r4a',a:'CFO',b:'KC',bo:3,time:'10/30(금) 05:00',stake:'패자 탈락'},
- {id:'r4b',a:'BLG',b:'TES',bo:3,time:'10/30(금) 08:00',stake:'승자 8강 진출'},
  {id:'r4c',a:'TL',b:'LOS',bo:3,time:'10/31(토) 05:00',stake:'패자 탈락'},
  {id:'r4d',a:'G2',b:'HLE',bo:3,time:'10/31(토) 08:00',stake:'패자 탈락'},
 ];
 const SCHEDULE = [
- {t:'스위스 4라운드',d:'10/29–10/31 KST',s:'진행 중 · T1, IG 8강 확정',now:1},
+ {t:'스위스 4라운드',d:'10/29–10/31 KST',s:'진행 중 · GenG, DK, T1, IG, TES 8강 확정',now:1},
  {t:'스위스 5라운드',d:'11/1(일) KST 예정',s:'2승 2패 6팀, 3판 2선승'},
  {t:'8강 · 4강',d:'11/3–11/8 (현지)',s:'미국 앨런, 5판 3선승'},
  {t:'결승',d:'11/14 (현지)',s:'브루클린 바클레이스 센터'},
@@ -840,7 +839,7 @@ const GAME_MATCHES = [
  {id:'r4d',a:'G2',b:'HLE',bo:3,start:'2026-10-30T23:00:00Z',label:'스위스 4R · 패자 탈락'},
 ];
 // Official results for GAME_MATCHES: id -> {w: winning team id, s: 'winner-loser games'}
-const OFFICIAL = {};
+const OFFICIAL = {r4a:{w:'KC',s:'2-0'},r4b:{w:'TES',s:'2-1'}};
 // Knockout stage. QF_DRAW: null until the real quarterfinal draw is known, then [[a,b],[c,d],[e,f],[g,h]]
 // in bracket order (QF1+QF2 winners meet in SF1, QF3+QF4 in SF2). KO_RESULTS: 'qf1'..'qf4','sf1','sf2','f' -> winner id.
 const QF_DRAW = null;
@@ -863,7 +862,9 @@ const PCHAMP = {
  'LYON:Dhokla':{Olaf:[1,1]},'LYON:Inspired':{Nocturne:[0,1]},'LYON:Saint':{Sylas:[0,1]},'LYON:Berserker':{Ezreal:[1,1]},'LYON:Isles':{Karma:[0,1]},
  'IG:TheShy':{Ornn:[1,0],Zaahen:[0,1],Kled:[1,0]},'IG:JiaQi':{Yunara:[1,0],Jhin:[0,1],Caitlyn:[1,0]},
  'IG:Rookie':{Aurora:[1,0],Corki:[0,1],Orianna:[1,0],Annie:[1,0]},'IG:Wei':{LeeSin:[0,1]},'IG:meiko':{Nautilus:[0,1],Lux:[1,0]},
- 'HLE:Zeus':{Olaf:[0,1]},'KC:Canna':{Jax:[1,0]}
+ 'HLE:Zeus':{Olaf:[0,1]},'KC:Canna':{Jax:[1,0]},
+ 'KC:Busio':{Nautilus:[1,0]},'KC:Yike':{MonkeyKing:[1,0]},'KC:Kyeahoo':{Cassiopeia:[1,0]},'CFO:Doggo':{Caitlyn:[0,1]},
+ 'TES:JackeyLove':{Jhin:[0,1],Lucian:[1,0]},'TES:369':{Jayce:[0,1]},'BLG:Knight':{LeBlanc:[0,1]}
 };
 // ===================== MODEL =====================
 const ROLES=['top','jng','mid','bot','sup'];
@@ -1116,7 +1117,7 @@ function playerOptions(sel){
   return ALL_PLAYER_OPTS.map(g=>`<optgroup label="${esc(g.label)}">${g.ps.map(p=>`<option value="${p.pid}"${p.pid===sel?' selected':''}>${esc(p.name)} (${AB(p.team)} ${ROLE_KO[p.role]}${p.sub?'·서브':''}) ${p.r}</option>`).join('')}</optgroup>`).join('')}
 
 // ---- tournament / player records
-function metaStat(k){const m=META[k];if(!m)return null;return{p:m.p||0,b:m.b||0,pr:(m.p||0)/META_GAMES,br:(m.b||0)/META_GAMES,wr:m.w!=null&&m.p?m.w/m.p:null,w:m.w}}
+function metaStat(k){const m=META[k];if(!m)return null;return{p:m.p||0,b:m.b||0,pr:(m.p||0)/META_GAMES,br:(m.b||0)/META_GAMES,wr:m.w!=null&&(m.wp||m.p)?m.w/(m.wp||m.p):null,w:m.w,wp:m.wp||m.p}}
 function statShort(k){const s=metaStat(k);if(!s)return'월즈 픽·밴 거의 없음';return`월즈 픽 ${pct(s.pr)}% · 밴 ${META[k].b!=null?pct(s.br)+'%':'25%↓'}${s.wr!=null?` · 승 ${pct(s.wr)}%`:''}`}
 function playerRec(pid,k){const r=PCHAMP[pid]&&PCHAMP[pid][k];return r?r:null}
 function recTxt(r){return r?`${r[0]}승 ${r[1]}패`:'—'}
@@ -1179,7 +1180,7 @@ function route(){const v=(location.hash||'#worlds').slice(1);const ok=['live','v
 window.addEventListener('hashchange',route);
 
 // =============== 1. LIVE ===============
-const L={B:{tid:'BLG',pids:defaultLineup('BLG')},R:{tid:'TES',pids:defaultLineup('TES')},
+const L={B:{tid:'G2',pids:defaultLineup('G2')},R:{tid:'HLE',pids:defaultLineup('HLE')},
   step:0,bans:{B:[],R:[]},picks:{B:{},R:{}},manual:{B:false,R:false},hist:[],locked:new Set(),wp:[],sel:null,roleF:'all',q:'',timerOn:false,tleft:30,example:true};
 function liveState(){return{bans:L.bans,picks:L.picks}}
 function snapshot(){return JSON.stringify({step:L.step,bans:L.bans,picks:L.picks,manual:L.manual,wp:L.wp})}
@@ -1306,7 +1307,7 @@ function renderDraftTable(){
   if(!rows.length){$('#draftTable').innerHTML='<p class="muted">밴이나 픽이 들어오면 챔피언별 이번 대회 기록이 여기에 쌓입니다.</p>';return}
   $('#draftTable').innerHTML=`<div class="tbl"><table class="st"><thead><tr><th>팀</th><th>구분</th><th>챔피언</th><th>선수</th><th>월즈 픽률</th><th>밴률</th><th>대회 승률</th><th>선수 이번 대회</th><th>선수 숙련도</th></tr></thead><tbody>${rows.map(x=>{const s=metaStat(x.k);
     return`<tr><td class="${x.side==='B'?'cb':'cr'}"><b>${AB(L[x.side].tid)}</b></td><td>${x.type==='밴'?'<span class="chip r">밴</span>':`<span class="chip">${x.type}</span>`}</td><td><span style="display:inline-flex;align-items:center;gap:6px">${ct(x.k,'sm')}${esc(CH[x.k].ko)}</span></td><td>${esc(x.who)}</td>
-    <td class="num">${s?`${pct(s.pr)}% <span class="dim">(${s.p})</span>`:'—'}</td><td class="num">${s?(META[x.k].b!=null?`${pct(s.br)}% <span class="dim">(${s.b})</span>`:'25% 미만'):'—'}</td><td class="num">${s&&s.wr!=null?`${pct(s.wr)}% <span class="dim">(${s.w}-${s.p-s.w})</span>`:'—'}</td><td class="num">${x.rec}</td><td>${x.cf}</td></tr>`}).join('')}</tbody></table></div>`}
+    <td class="num">${s?`${pct(s.pr)}% <span class="dim">(${s.p})</span>`:'—'}</td><td class="num">${s?(META[x.k].b!=null?`${pct(s.br)}% <span class="dim">(${s.b})</span>`:'25% 미만'):'—'}</td><td class="num">${s&&s.wr!=null?`${pct(s.wr)}% <span class="dim">(${s.w}-${s.wp-s.w})</span>`:'—'}</td><td class="num">${x.rec}</td><td>${x.cf}</td></tr>`}).join('')}</tbody></table></div>`}
 function renderComp(ev){
   const box=(c,side)=>{const tid=AB(L[side].tid);if(!c.n)return`<div class="cs"><h4 class="${side==='B'?'cb':'cr'}">${tid}</h4><p class="muted">픽이 들어오면 조합 분석이 표시됩니다.</p></div>`;
     const ap=Math.round(c.ap/c.n*100);const tags=Object.entries(c.cnt).sort((a,b)=>b[1]-a[1]).slice(0,6);
@@ -1323,7 +1324,7 @@ function renderComp(ev){
   if(L.step>=6&&open.length)notes.push(`<b>밴 없이 풀린 대회 최다 밴 챔피언</b> — ${open.map(k=>`${esc(CH[k].ko)}(밴 ${META[k].b})`).join(', ')}. 다음 픽 차례에 가져가면 큰 이득.`);
   const topBan=allBans.filter(k=>META[k]&&META[k].b).sort((a,b)=>META[b].b-META[a].b).slice(0,3);
   if(topBan.length)notes.push(`<b>이번 밴 중 대회 밴률 상위</b> — ${topBan.map(k=>`${esc(CH[k].ko)} ${pct(META[k].b/META_GAMES)}%`).join(', ')}. 대회 흐름대로의 견제.`);
-  notes.push(`<b>패치 26.20 월즈 메타</b> — 정글 녹턴·바이·리 신·자르반, 미드 오리아나·신드라·카시오페아, 탑 럼블·암베사·크산테, 원딜 이즈리얼·진·칼리스타, 서폿 알리스타·노틸러스·레나타가 중심. 53경기 기준 녹턴 40밴, 바이 31밴, 카시오페아 29밴. 승률은 카시오페아(6승 1패), 노틸러스·바이(약 65%)가 높고 아칼리(25%)·알리스타(29%)는 픽 대비 성적이 낮다.`);
+  notes.push(`<b>패치 26.20 월즈 메타</b> — 정글 녹턴·바이·리 신·자르반, 미드 오리아나·신드라·카시오페아, 탑 럼블·암베사·크산테, 원딜 이즈리얼·진·칼리스타, 서폿 알리스타·노틸러스·레나타가 중심. 61경기 기준 녹턴 45밴, 카시오페아 35밴, 바이 33밴. 승률은 카시오페아(6승 1패), 노틸러스·바이(약 65%)가 높고 아칼리(25%)·알리스타(29%)는 픽 대비 성적이 낮다.`);
   $('#metaNotes').innerHTML=notes.map(n=>`<li>${n}</li>`).join('');
 }
 function renderSpark(){
@@ -1656,7 +1657,7 @@ function runWorlds(){
     <div class="tm r"><b>${esc(TEAMS[m.b].ab)}</b><span class="muted">${base[m.b].w}-${base[m.b].l}</span><button class="wb${set===m.b?' on':''}" data-m="${m.id}" data-w="${m.b}">${set===m.b?'✓ 승리':'승리 입력'}</button></div></div>`}).join('');
   $('#wPend').querySelectorAll('.wb').forEach(b=>b.onclick=()=>{const id=b.dataset.m;W.res[id]=W.res[id]===b.dataset.w?undefined:b.dataset.w;if(!W.res[id])delete W.res[id];runWorlds()});
   const p22=MAIN.filter(t=>base[t].w===2&&base[t].l===2);
-  $('#wR5').innerHTML=`5라운드(2승 2패 6팀 3판 2선승) 대진은 4라운드 종료 후 추첨됩니다. 현재 2승 2패: ${p22.map(t=>TEAMS[t].ab).join(', ')||'—'} + 4라운드 결과에 따라 합류.`;
+  $('#wR5').innerHTML=`5라운드(2승 2패 6팀, 3판 2선승) 대진은 4라운드가 끝나면 추첨됩니다. 현재 2승 2패: ${p22.map(t=>TEAMS[t].ab).join(', ')||'—'} + 4라운드 결과에 따라 합류.`;
   // bracket
   const nm=t=>esc(TEAMS[t].ab);
   const used=new Set();
