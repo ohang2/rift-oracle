@@ -1,0 +1,1322 @@
+{
+ "updated": "2026-11-01T08:32:54.993Z",
+ "league": "98767975604431411",
+ "events": [
+  {
+   "id": "115660588583171786",
+   "start": "2026-10-15T18:00:00Z",
+   "state": "completed",
+   "block": "Play-Ins",
+   "bo": 5,
+   "teams": [
+    {
+     "code": "KC",
+     "name": "Karmine Corp",
+     "win": "win",
+     "gw": 3,
+     "rec": {
+      "w": 3,
+      "l": 0
+     }
+    },
+    {
+     "code": "C9",
+     "name": "Cloud9 Kia",
+     "win": "loss",
+     "gw": 2,
+     "rec": {
+      "w": 0,
+      "l": 2
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660588583040710",
+   "start": "2026-10-15T23:00:00Z",
+   "state": "completed",
+   "block": "Play-Ins",
+   "bo": 5,
+   "teams": [
+    {
+     "code": "MVK",
+     "name": "MVK Esports",
+     "win": "win",
+     "gw": 3,
+     "rec": {
+      "w": 2,
+      "l": 2
+     }
+    },
+    {
+     "code": "FUR",
+     "name": "FURIA",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 1,
+      "l": 2
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660588583171790",
+   "start": "2026-10-16T18:00:00Z",
+   "state": "completed",
+   "block": "Play-Ins",
+   "bo": 5,
+   "teams": [
+    {
+     "code": "KC",
+     "name": "Karmine Corp",
+     "win": "win",
+     "gw": 3,
+     "rec": {
+      "w": 3,
+      "l": 0
+     }
+    },
+    {
+     "code": "MVK",
+     "name": "MVK Esports",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 2,
+      "l": 2
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660588583171794",
+   "start": "2026-10-16T23:00:00Z",
+   "state": "completed",
+   "block": "Play-Ins",
+   "bo": 5,
+   "teams": [
+    {
+     "code": "FUR",
+     "name": "FURIA",
+     "win": "win",
+     "gw": 3,
+     "rec": {
+      "w": 1,
+      "l": 2
+     }
+    },
+    {
+     "code": "C9",
+     "name": "Cloud9 Kia",
+     "win": "loss",
+     "gw": 1,
+     "rec": {
+      "w": 0,
+      "l": 2
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660588583171798",
+   "start": "2026-10-17T18:00:00Z",
+   "state": "completed",
+   "block": "Play-Ins",
+   "bo": 5,
+   "teams": [
+    {
+     "code": "MVK",
+     "name": "MVK Esports",
+     "win": "win",
+     "gw": 3,
+     "rec": {
+      "w": 2,
+      "l": 2
+     }
+    },
+    {
+     "code": "FUR",
+     "name": "FURIA",
+     "win": "loss",
+     "gw": 1,
+     "rec": {
+      "w": 1,
+      "l": 2
+     }
+    }
+   ]
+  },
+  {
+   "id": "116299649498303884",
+   "start": "2026-10-18T18:00:00Z",
+   "state": "completed",
+   "block": "Play-Ins",
+   "bo": 5,
+   "teams": [
+    {
+     "code": "KC",
+     "name": "Karmine Corp",
+     "win": "win",
+     "gw": 3,
+     "rec": {
+      "w": 3,
+      "l": 0
+     }
+    },
+    {
+     "code": "MVK",
+     "name": "MVK Esports",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 2,
+      "l": 2
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095005",
+   "start": "2026-10-23T17:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 1,
+   "teams": [
+    {
+     "code": "IG",
+     "name": "Invictus Gaming",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 3,
+      "l": 1
+     }
+    },
+    {
+     "code": "GEN",
+     "name": "Gen.G Esports",
+     "win": "win",
+     "gw": 1,
+     "rec": {
+      "w": 3,
+      "l": 0
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095013",
+   "start": "2026-10-23T18:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 1,
+   "teams": [
+    {
+     "code": "TES",
+     "name": "TOP ESPORTS",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 3,
+      "l": 1
+     }
+    },
+    {
+     "code": "HLE",
+     "name": "Hanwha Life Esports",
+     "win": "win",
+     "gw": 1,
+     "rec": {
+      "w": 2,
+      "l": 3
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095019",
+   "start": "2026-10-23T19:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 1,
+   "teams": [
+    {
+     "code": "MKOI",
+     "name": "Movistar KOI",
+     "win": "win",
+     "gw": 1,
+     "rec": {
+      "w": 2,
+      "l": 3
+     }
+    },
+    {
+     "code": "BLG",
+     "name": "BILIBILI GAMING",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 3,
+      "l": 2
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095009",
+   "start": "2026-10-23T20:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 1,
+   "teams": [
+    {
+     "code": "KC",
+     "name": "Karmine Corp",
+     "win": "win",
+     "gw": 1,
+     "rec": {
+      "w": 3,
+      "l": 2
+     }
+    },
+    {
+     "code": "AL",
+     "name": "Anyone's Legend",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 0,
+      "l": 3
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095011",
+   "start": "2026-10-23T21:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 1,
+   "teams": [
+    {
+     "code": "DK",
+     "name": "Dplus KIA",
+     "win": "win",
+     "gw": 1,
+     "rec": {
+      "w": 3,
+      "l": 0
+     }
+    },
+    {
+     "code": "G2",
+     "name": "G2 Esports",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 1,
+      "l": 3
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095007",
+   "start": "2026-10-23T22:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 1,
+   "teams": [
+    {
+     "code": "TLAW",
+     "name": "Team Liquid Alienware",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 1,
+      "l": 3
+     }
+    },
+    {
+     "code": "CFO",
+     "name": "CTBC Flying Oyster",
+     "win": "win",
+     "gw": 1,
+     "rec": {
+      "w": 1,
+      "l": 3
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095015",
+   "start": "2026-10-23T23:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 1,
+   "teams": [
+    {
+     "code": "LOS",
+     "name": "LOS",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 2,
+      "l": 3
+     }
+    },
+    {
+     "code": "T1",
+     "name": "T1",
+     "win": "win",
+     "gw": 1,
+     "rec": {
+      "w": 3,
+      "l": 1
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095017",
+   "start": "2026-10-24T00:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 1,
+   "teams": [
+    {
+     "code": "LYON",
+     "name": "LYON",
+     "win": "win",
+     "gw": 1,
+     "rec": {
+      "w": 3,
+      "l": 2
+     }
+    },
+    {
+     "code": "TSW",
+     "name": "Team Secret Whales",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 0,
+      "l": 3
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095029",
+   "start": "2026-10-24T17:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 1,
+   "teams": [
+    {
+     "code": "TES",
+     "name": "TOP ESPORTS",
+     "win": "win",
+     "gw": 1,
+     "rec": {
+      "w": 3,
+      "l": 1
+     }
+    },
+    {
+     "code": "AL",
+     "name": "Anyone's Legend",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 0,
+      "l": 3
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095021",
+   "start": "2026-10-24T18:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 1,
+   "teams": [
+    {
+     "code": "MKOI",
+     "name": "Movistar KOI",
+     "win": "win",
+     "gw": 1,
+     "rec": {
+      "w": 2,
+      "l": 3
+     }
+    },
+    {
+     "code": "CFO",
+     "name": "CTBC Flying Oyster",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 1,
+      "l": 3
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095031",
+   "start": "2026-10-24T19:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 1,
+   "teams": [
+    {
+     "code": "LOS",
+     "name": "LOS",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 2,
+      "l": 3
+     }
+    },
+    {
+     "code": "G2",
+     "name": "G2 Esports",
+     "win": "win",
+     "gw": 1,
+     "rec": {
+      "w": 1,
+      "l": 3
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095023",
+   "start": "2026-10-24T20:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 1,
+   "teams": [
+    {
+     "code": "KC",
+     "name": "Karmine Corp",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 3,
+      "l": 2
+     }
+    },
+    {
+     "code": "LYON",
+     "name": "LYON",
+     "win": "win",
+     "gw": 1,
+     "rec": {
+      "w": 3,
+      "l": 2
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095033",
+   "start": "2026-10-24T21:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 1,
+   "teams": [
+    {
+     "code": "TSW",
+     "name": "Team Secret Whales",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 0,
+      "l": 3
+     }
+    },
+    {
+     "code": "IG",
+     "name": "Invictus Gaming",
+     "win": "win",
+     "gw": 1,
+     "rec": {
+      "w": 3,
+      "l": 1
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095025",
+   "start": "2026-10-24T22:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 1,
+   "teams": [
+    {
+     "code": "HLE",
+     "name": "Hanwha Life Esports",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 2,
+      "l": 3
+     }
+    },
+    {
+     "code": "GEN",
+     "name": "Gen.G Esports",
+     "win": "win",
+     "gw": 1,
+     "rec": {
+      "w": 3,
+      "l": 0
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095027",
+   "start": "2026-10-24T23:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 1,
+   "teams": [
+    {
+     "code": "DK",
+     "name": "Dplus KIA",
+     "win": "win",
+     "gw": 1,
+     "rec": {
+      "w": 3,
+      "l": 0
+     }
+    },
+    {
+     "code": "T1",
+     "name": "T1",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 3,
+      "l": 1
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095035",
+   "start": "2026-10-25T00:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 1,
+   "teams": [
+    {
+     "code": "TLAW",
+     "name": "Team Liquid Alienware",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 1,
+      "l": 3
+     }
+    },
+    {
+     "code": "BLG",
+     "name": "BILIBILI GAMING",
+     "win": "win",
+     "gw": 1,
+     "rec": {
+      "w": 3,
+      "l": 2
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095045",
+   "start": "2026-10-25T17:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 1,
+   "teams": [
+    {
+     "code": "IG",
+     "name": "Invictus Gaming",
+     "win": "win",
+     "gw": 1,
+     "rec": {
+      "w": 3,
+      "l": 1
+     }
+    },
+    {
+     "code": "HLE",
+     "name": "Hanwha Life Esports",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 2,
+      "l": 3
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095047",
+   "start": "2026-10-25T18:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 1,
+   "teams": [
+    {
+     "code": "TES",
+     "name": "TOP ESPORTS",
+     "win": "win",
+     "gw": 1,
+     "rec": {
+      "w": 3,
+      "l": 1
+     }
+    },
+    {
+     "code": "G2",
+     "name": "G2 Esports",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 1,
+      "l": 3
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095037",
+   "start": "2026-10-25T19:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 3,
+   "teams": [
+    {
+     "code": "MKOI",
+     "name": "Movistar KOI",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 2,
+      "l": 3
+     }
+    },
+    {
+     "code": "DK",
+     "name": "Dplus KIA",
+     "win": "win",
+     "gw": 2,
+     "rec": {
+      "w": 3,
+      "l": 0
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095041",
+   "start": "2026-10-25T22:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 3,
+   "teams": [
+    {
+     "code": "LYON",
+     "name": "LYON",
+     "win": "loss",
+     "gw": 1,
+     "rec": {
+      "w": 3,
+      "l": 2
+     }
+    },
+    {
+     "code": "GEN",
+     "name": "Gen.G Esports",
+     "win": "win",
+     "gw": 2,
+     "rec": {
+      "w": 3,
+      "l": 0
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095049",
+   "start": "2026-10-26T17:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 1,
+   "teams": [
+    {
+     "code": "T1",
+     "name": "T1",
+     "win": "win",
+     "gw": 1,
+     "rec": {
+      "w": 3,
+      "l": 1
+     }
+    },
+    {
+     "code": "CFO",
+     "name": "CTBC Flying Oyster",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 1,
+      "l": 3
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095051",
+   "start": "2026-10-26T18:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 1,
+   "teams": [
+    {
+     "code": "BLG",
+     "name": "BILIBILI GAMING",
+     "win": "win",
+     "gw": 1,
+     "rec": {
+      "w": 3,
+      "l": 2
+     }
+    },
+    {
+     "code": "KC",
+     "name": "Karmine Corp",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 3,
+      "l": 2
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095053",
+   "start": "2026-10-26T19:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 3,
+   "teams": [
+    {
+     "code": "TSW",
+     "name": "Team Secret Whales",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 0,
+      "l": 3
+     }
+    },
+    {
+     "code": "LOS",
+     "name": "LOS",
+     "win": "win",
+     "gw": 2,
+     "rec": {
+      "w": 2,
+      "l": 3
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095057",
+   "start": "2026-10-26T22:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 3,
+   "teams": [
+    {
+     "code": "AL",
+     "name": "Anyone's Legend",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 0,
+      "l": 3
+     }
+    },
+    {
+     "code": "TLAW",
+     "name": "Team Liquid Alienware",
+     "win": "win",
+     "gw": 2,
+     "rec": {
+      "w": 1,
+      "l": 3
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095061",
+   "start": "2026-10-28T20:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 3,
+   "teams": [
+    {
+     "code": "T1",
+     "name": "T1",
+     "win": "win",
+     "gw": 2,
+     "rec": {
+      "w": 3,
+      "l": 1
+     }
+    },
+    {
+     "code": "MKOI",
+     "name": "Movistar KOI",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 2,
+      "l": 3
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095065",
+   "start": "2026-10-28T23:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 3,
+   "teams": [
+    {
+     "code": "LYON",
+     "name": "LYON",
+     "win": "loss",
+     "gw": 1,
+     "rec": {
+      "w": 3,
+      "l": 2
+     }
+    },
+    {
+     "code": "IG",
+     "name": "Invictus Gaming",
+     "win": "win",
+     "gw": 2,
+     "rec": {
+      "w": 3,
+      "l": 1
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095073",
+   "start": "2026-10-29T20:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 3,
+   "teams": [
+    {
+     "code": "KC",
+     "name": "Karmine Corp",
+     "win": "win",
+     "gw": 2,
+     "rec": {
+      "w": 3,
+      "l": 2
+     }
+    },
+    {
+     "code": "CFO",
+     "name": "CTBC Flying Oyster",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 1,
+      "l": 3
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095069",
+   "start": "2026-10-29T23:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 3,
+   "teams": [
+    {
+     "code": "BLG",
+     "name": "BILIBILI GAMING",
+     "win": "loss",
+     "gw": 1,
+     "rec": {
+      "w": 3,
+      "l": 2
+     }
+    },
+    {
+     "code": "TES",
+     "name": "TOP ESPORTS",
+     "win": "win",
+     "gw": 2,
+     "rec": {
+      "w": 3,
+      "l": 1
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095077",
+   "start": "2026-10-30T20:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 3,
+   "teams": [
+    {
+     "code": "LOS",
+     "name": "LOS",
+     "win": "win",
+     "gw": 2,
+     "rec": {
+      "w": 2,
+      "l": 3
+     }
+    },
+    {
+     "code": "TLAW",
+     "name": "Team Liquid Alienware",
+     "win": "loss",
+     "gw": 1,
+     "rec": {
+      "w": 1,
+      "l": 3
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095081",
+   "start": "2026-10-30T23:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 3,
+   "teams": [
+    {
+     "code": "G2",
+     "name": "G2 Esports",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 1,
+      "l": 3
+     }
+    },
+    {
+     "code": "HLE",
+     "name": "Hanwha Life Esports",
+     "win": "win",
+     "gw": 2,
+     "rec": {
+      "w": 2,
+      "l": 3
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095085",
+   "start": "2026-10-31T17:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 3,
+   "teams": [
+    {
+     "code": "KC",
+     "name": "Karmine Corp",
+     "win": "win",
+     "gw": 2,
+     "rec": {
+      "w": 3,
+      "l": 2
+     }
+    },
+    {
+     "code": "MKOI",
+     "name": "Movistar KOI",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 2,
+      "l": 3
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095089",
+   "start": "2026-10-31T20:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 3,
+   "teams": [
+    {
+     "code": "LYON",
+     "name": "LYON",
+     "win": "win",
+     "gw": 2,
+     "rec": {
+      "w": 3,
+      "l": 2
+     }
+    },
+    {
+     "code": "LOS",
+     "name": "LOS",
+     "win": "loss",
+     "gw": 1,
+     "rec": {
+      "w": 2,
+      "l": 3
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095093",
+   "start": "2026-10-31T23:00:00Z",
+   "state": "completed",
+   "block": "Swiss",
+   "bo": 3,
+   "teams": [
+    {
+     "code": "BLG",
+     "name": "BILIBILI GAMING",
+     "win": "win",
+     "gw": 2,
+     "rec": {
+      "w": 3,
+      "l": 2
+     }
+    },
+    {
+     "code": "HLE",
+     "name": "Hanwha Life Esports",
+     "win": "loss",
+     "gw": 0,
+     "rec": {
+      "w": 2,
+      "l": 3
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095109",
+   "start": "2026-11-03T22:00:00Z",
+   "state": "unstarted",
+   "block": "Quarterfinals",
+   "bo": 5,
+   "teams": [
+    {
+     "code": "TES",
+     "name": "TOP ESPORTS",
+     "win": null,
+     "gw": 0,
+     "rec": {
+      "w": 0,
+      "l": 0
+     }
+    },
+    {
+     "code": "IG",
+     "name": "Invictus Gaming",
+     "win": null,
+     "gw": 0,
+     "rec": {
+      "w": 0,
+      "l": 0
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095115",
+   "start": "2026-11-04T22:00:00Z",
+   "state": "unstarted",
+   "block": "Quarterfinals",
+   "bo": 5,
+   "teams": [
+    {
+     "code": "GEN",
+     "name": "Gen.G Esports",
+     "win": null,
+     "gw": 0,
+     "rec": {
+      "w": 0,
+      "l": 0
+     }
+    },
+    {
+     "code": "LYON",
+     "name": "LYON",
+     "win": null,
+     "gw": 0,
+     "rec": {
+      "w": 0,
+      "l": 0
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095097",
+   "start": "2026-11-05T22:00:00Z",
+   "state": "unstarted",
+   "block": "Quarterfinals",
+   "bo": 5,
+   "teams": [
+    {
+     "code": "DK",
+     "name": "Dplus KIA",
+     "win": null,
+     "gw": 0,
+     "rec": {
+      "w": 0,
+      "l": 0
+     }
+    },
+    {
+     "code": "BLG",
+     "name": "BILIBILI GAMING",
+     "win": null,
+     "gw": 0,
+     "rec": {
+      "w": 0,
+      "l": 0
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095103",
+   "start": "2026-11-06T22:00:00Z",
+   "state": "unstarted",
+   "block": "Quarterfinals",
+   "bo": 5,
+   "teams": [
+    {
+     "code": "T1",
+     "name": "T1",
+     "win": null,
+     "gw": 0,
+     "rec": {
+      "w": 0,
+      "l": 0
+     }
+    },
+    {
+     "code": "KC",
+     "name": "Karmine Corp",
+     "win": null,
+     "gw": 0,
+     "rec": {
+      "w": 0,
+      "l": 0
+     }
+    }
+   ]
+  },
+  {
+   "id": "115660540726095127",
+   "start": "2026-11-07T22:00:00Z",
+   "state": "unstarted",
+   "block": "Semifinals",
+   "bo": 5,
+   "teams": [
+    {
+     "code": "TBD",
+     "name": "TBD",
+     "win": null,
+     "gw": null,
+     "rec": null
+    },
+    {
+     "code": "TBD",
+     "name": "TBD",
+     "win": null,
+     "gw": null,
+     "rec": null
+    }
+   ]
+  },
+  {
+   "id": "115660540726095121",
+   "start": "2026-11-08T22:00:00Z",
+   "state": "unstarted",
+   "block": "Semifinals",
+   "bo": 5,
+   "teams": [
+    {
+     "code": "TBD",
+     "name": "TBD",
+     "win": null,
+     "gw": null,
+     "rec": null
+    },
+    {
+     "code": "TBD",
+     "name": "TBD",
+     "win": null,
+     "gw": null,
+     "rec": null
+    }
+   ]
+  },
+  {
+   "id": "115660540726095133",
+   "start": "2026-11-14T19:00:00Z",
+   "state": "unstarted",
+   "block": "Finals",
+   "bo": 5,
+   "teams": [
+    {
+     "code": "TBD",
+     "name": "TBD",
+     "win": null,
+     "gw": null,
+     "rec": null
+    },
+    {
+     "code": "TBD",
+     "name": "TBD",
+     "win": null,
+     "gw": null,
+     "rec": null
+    }
+   ]
+  }
+ ]
+}
