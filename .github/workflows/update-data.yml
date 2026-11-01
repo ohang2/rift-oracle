@@ -1,0 +1,43 @@
+name: Update Worlds data
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'   # GitHub may delay scheduled runs by several minutes
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/update-data.yml'
+      - 'scripts/**'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Fetch schedule and results
+        run: node scripts/update-data.mjs
+      - name: Commit data if it changed
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data
+          if git diff --cached --quiet; then
+            echo "No data changes"
+          else
+            git commit -m "data: update Worlds schedule and results"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
