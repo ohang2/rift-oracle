@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="롤 실시간 밴픽 승률 예측, 인게임 실시간 승률, 가상 매치 시뮬레이터, 2026 월즈 대진표 예측, 무료 승부예측 챌린지">
+<title>리프트 오라클</title>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
@@ -328,6 +329,19 @@ table.igk input{width:46px;padding:4px 5px}
 ul.drv{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
 ul.drv li{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;padding:5px 8px;background:var(--bg2);border-radius:3px}
 #igOut{margin-top:14px}
+.livewrap{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.syncbar{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.syncbar .dot{width:8px;height:8px;border-radius:50%;background:var(--dim);flex:none}
+.syncbar .dot.api{background:var(--good);box-shadow:0 0 0 3px rgba(82,192,141,.2)}
+.syncbar .dot.file{background:var(--warn)}
+.livebar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border:1px solid rgba(232,87,78,.55);border-radius:var(--r);background:linear-gradient(90deg,var(--redDim),var(--panel) 60%)}
+.livebar b{font-family:var(--f-disp);font-size:20px;letter-spacing:.04em}
+.livebar .num{font-family:var(--f-disp);font-size:20px;color:var(--gold2)}
+.livebar .btn{margin-left:auto}
+.lv{font-size:10.5px;font-weight:700;letter-spacing:.1em;color:#fff;background:var(--red);border-radius:3px;padding:2px 6px;animation:pulse 1.6s ease-in-out infinite}
+.gamesync:empty{display:none}
+.gamesync{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12.5px;padding:8px 12px;margin-bottom:12px;border:1px solid var(--line2);border-radius:var(--r);background:var(--panel)}
+.gamesync .btn{margin-left:auto}
 footer{border-top:1px solid var(--line);padding-block:20px;color:var(--muted);font-size:12px}
 footer .wrap{display:flex;flex-direction:column;gap:6px}
 footer a{color:var(--gold)}
@@ -396,6 +410,8 @@ footer a{color:var(--gold)}
     </div>
   </div>
 
+  <div id="lLive" class="livewrap"></div>
+  <div id="gameSync" class="gamesync"></div>
   <div class="setup">
     <div class="card tcard" id="setupB"></div>
     <div class="card tcard red" id="setupR"></div>
@@ -502,10 +518,11 @@ footer a{color:var(--gold)}
   <div class="vhead">
     <div>
       <h2 class="vt">2026 월드 챔피언십 예측</h2>
-      <p>스위스 스테이지 실제 결과를 반영한 레이팅으로 남은 경기와 8강 이후 대진을 5,000번 시뮬레이션합니다. 아직 안 끝난 경기는 직접 결과를 눌러 넣으면 즉시 다시 계산됩니다.</p>
+      <p>스위스 스테이지 실제 결과를 반영한 레이팅으로 남은 경기와 8강 이후 대진을 5,000번 시뮬레이션합니다. 경기 결과와 대진은 lolesports 데이터로 자동 갱신되며, 아직 안 끝난 경기는 결과를 눌러 가상으로 넣어 볼 수 있습니다.</p>
     </div>
     <div class="tools"><button class="btn pri" id="wRun">다시 시뮬레이션</button></div>
   </div>
+  <div id="wLive" class="livewrap"></div>
   <div class="wtop" id="wTop"></div>
   <div class="deck" style="margin-top:0">
     <div class="card s7">
@@ -563,7 +580,7 @@ footer a{color:var(--gold)}
 
 <footer>
   <div class="wrap">
-    <div>경기 결과·로스터: LoL Esports 공식 결과와 Leaguepedia, Liquipedia, GosuGamers, 인벤, OSEN, 스포츠경향, 쿠키뉴스 보도 (10/30 오전 기준). 챔피언 픽·밴 기록: 월즈 2026 플레이인+스위스 61경기 집계(lolworlds2026.com, nerfplz.com).</div>
+    <div>경기 일정·결과는 lolesports.com 공개 데이터를 자동으로 받아옵니다(비공식 API라 연결이 끊기면 저장된 데이터로 표시). 경기 결과·로스터 원자료: LoL Esports 공식 결과와 Leaguepedia, Liquipedia, GosuGamers, 인벤, OSEN, 스포츠경향, 쿠키뉴스 보도 (10/30 오전 기준). 챔피언 픽·밴 기록: 월즈 2026 플레이인+스위스 61경기 집계(lolworlds2026.com, nerfplz.com).</div>
     <div>리프트 오라클은 Riot Games가 보증하지 않는 팬 사이트입니다. League of Legends와 챔피언 이미지는 Riot Games의 상표 및 저작물이며, 이미지는 Community Dragon을 통해 불러옵니다.</div>
     <div>선수 레이팅, 챔피언 숙련도, 시간대별 승률은 2026 시즌·국제전 성적을 바탕으로 한 자체 추정 모델입니다. 실제 결과와 다를 수 있으며 베팅 용도가 아닙니다. LoL 대회 시즌 개막 로스터를 쓴 비월즈 팀은 시즌 중 변동이 있을 수 있습니다.</div>
   </div>
@@ -812,37 +829,30 @@ const TEAMS_RAW = [
 const REGION = {LCK:'KR',LPL:'CN',LEC:'EU',LCS:'NA',LCP:'AP',CBLOL:'BR'};
 
 // ==== LIVE DATA START ====
-// Updated by the scheduled results refresh. Everything the site needs to reflect new results lives in this block.
-const DATA_STAMP = '2026.10.30 10:15 KST';
+// Fallback data embedded in the page. On a hosted copy the site replaces it automatically with lolesports data
+// (directly, or via data/schedule.json refreshed by the GitHub Action).
+const DATA_STAMP = '2026.11.01 17:32 KST';
 // Worlds 2026 Swiss results [winner, loser, winnerGames, loserGames, round]
 const SWISS = [
- ['GEN','IG',1,0,1],['HLE','TES',1,0,1],['MKOI','BLG',1,0,1],['KC','AL',1,0,1],['DK','G2',1,0,1],['CFO','TL',1,0,1],['T1','LOS',1,0,1],['LYON','TSW',1,0,1],
- ['DK','T1',1,0,2],['MKOI','CFO',1,0,2],['GEN','HLE',1,0,2],['LYON','KC',1,0,2],['G2','LOS',1,0,2],['IG','TSW',1,0,2],['TES','AL',1,0,2],['BLG','TL',1,0,2],
- ['DK','MKOI',2,0,3],['GEN','LYON',2,1,3],['IG','HLE',1,0,3],['TES','G2',1,0,3],['T1','CFO',1,0,3],['BLG','KC',1,0,3],['LOS','TSW',2,0,3],['TL','AL',2,0,3],
- ['T1','MKOI',2,0,4],['IG','LYON',2,1,4],['KC','CFO',2,0,4],['TES','BLG',2,1,4],
+ ["GEN","IG",1,0,1],["HLE","TES",1,0,1],["MKOI","BLG",1,0,1],["KC","AL",1,0,1],["DK","G2",1,0,1],["CFO","TL",1,0,1],["T1","LOS",1,0,1],["LYON","TSW",1,0,1],
+ ["TES","AL",1,0,2],["MKOI","CFO",1,0,2],["G2","LOS",1,0,2],["LYON","KC",1,0,2],["IG","TSW",1,0,2],["GEN","HLE",1,0,2],["DK","T1",1,0,2],["BLG","TL",1,0,2],
+ ["IG","HLE",1,0,3],["TES","G2",1,0,3],["DK","MKOI",2,0,3],["GEN","LYON",2,1,3],["T1","CFO",1,0,3],["BLG","KC",1,0,3],["LOS","TSW",2,0,3],["TL","AL",2,0,3],
+ ["T1","MKOI",2,0,4],["IG","LYON",2,1,4],["KC","CFO",2,0,4],["TES","BLG",2,1,4],["LOS","TL",2,1,4],["HLE","G2",2,0,4],["KC","MKOI",2,0,5],["LYON","LOS",2,1,5],
+ ["BLG","HLE",2,0,5],
 ];
-const PENDING = [
- {id:'r4c',a:'TL',b:'LOS',bo:3,time:'10/31(토) 05:00',stake:'패자 탈락'},
- {id:'r4d',a:'G2',b:'HLE',bo:3,time:'10/31(토) 08:00',stake:'패자 탈락'},
-];
+const PENDING = [{"id":"m115660540726095109","a":"TES","b":"IG","bo":5,"time":"11/4(수) 07:00","stake":"8강","stage":"ko"},{"id":"m115660540726095115","a":"GEN","b":"LYON","bo":5,"time":"11/5(목) 07:00","stake":"8강","stage":"ko"},{"id":"m115660540726095097","a":"DK","b":"BLG","bo":5,"time":"11/6(금) 07:00","stake":"8강","stage":"ko"},{"id":"m115660540726095103","a":"T1","b":"KC","bo":5,"time":"11/7(토) 07:00","stake":"8강","stage":"ko"}];
 const SCHEDULE = [
- {t:'스위스 4라운드',d:'10/29–10/31 KST',s:'진행 중 · GenG, DK, T1, IG, TES 8강 확정',now:1},
- {t:'스위스 5라운드',d:'11/1(일) KST 예정',s:'2승 2패 6팀, 3판 2선승'},
- {t:'8강 · 4강',d:'11/3–11/8 (현지)',s:'미국 앨런, 5판 3선승'},
- {t:'결승',d:'11/14 (현지)',s:'브루클린 바클레이스 센터'},
+ {t:'스위스 4라운드',d:'10/29–10/31 KST',s:'종료',now:0},
+ {t:'스위스 5라운드',d:'11/1(일) KST',s:'종료 · 8강: GenG, DK, T1, IG, TES, KC, LYON, BLG'},
+ {t:'8강 · 4강',d:'11/4–11/9 KST',s:'미국 앨런, 5판 3선승',now:1},
+ {t:'결승',d:'11/15(일) KST',s:'브루클린 바클레이스 센터'},
 ];
 // Prediction-challenge matches (keep finished ones so their picks stay scored). start = ISO UTC.
-const GAME_MATCHES = [
- {id:'r4a',a:'CFO',b:'KC',bo:3,start:'2026-10-29T20:00:00Z',label:'스위스 4R · 패자 탈락'},
- {id:'r4b',a:'BLG',b:'TES',bo:3,start:'2026-10-29T23:00:00Z',label:'스위스 4R · 승자 8강'},
- {id:'r4c',a:'TL',b:'LOS',bo:3,start:'2026-10-30T20:00:00Z',label:'스위스 4R · 패자 탈락'},
- {id:'r4d',a:'G2',b:'HLE',bo:3,start:'2026-10-30T23:00:00Z',label:'스위스 4R · 패자 탈락'},
-];
+const GAME_MATCHES = [{"id":"r4a","a":"CFO","b":"KC","bo":3,"start":"2026-10-29T20:00:00Z","label":"스위스 4R · 패자 탈락"},{"id":"r4b","a":"BLG","b":"TES","bo":3,"start":"2026-10-29T23:00:00Z","label":"스위스 4R · 승자 8강"},{"id":"r4c","a":"TL","b":"LOS","bo":3,"start":"2026-10-30T20:00:00Z","label":"스위스 4R · 패자 탈락"},{"id":"r4d","a":"G2","b":"HLE","bo":3,"start":"2026-10-30T23:00:00Z","label":"스위스 4R · 패자 탈락"},{"id":"m115660540726095109","a":"TES","b":"IG","bo":5,"start":"2026-11-03T22:00:00Z","label":"8강"},{"id":"m115660540726095115","a":"GEN","b":"LYON","bo":5,"start":"2026-11-04T22:00:00Z","label":"8강"},{"id":"m115660540726095097","a":"DK","b":"BLG","bo":5,"start":"2026-11-05T22:00:00Z","label":"8강"},{"id":"m115660540726095103","a":"T1","b":"KC","bo":5,"start":"2026-11-06T22:00:00Z","label":"8강"}];
 // Official results for GAME_MATCHES: id -> {w: winning team id, s: 'winner-loser games'}
-const OFFICIAL = {r4a:{w:'KC',s:'2-0'},r4b:{w:'TES',s:'2-1'}};
-// Knockout stage. QF_DRAW: null until the real quarterfinal draw is known, then [[a,b],[c,d],[e,f],[g,h]]
-// in bracket order (QF1+QF2 winners meet in SF1, QF3+QF4 in SF2). KO_RESULTS: 'qf1'..'qf4','sf1','sf2','f' -> winner id.
-const QF_DRAW = null;
+const OFFICIAL = {"r4a":{"w":"KC","s":"2-0"},"r4b":{"w":"TES","s":"2-1"},"r4c":{"w":"LOS","s":"2-1"},"r4d":{"w":"HLE","s":"2-0"}};
+// Knockout stage. QF_DRAW in bracket order (QF1+QF2 winners meet in SF1, QF3+QF4 in SF2). KO_RESULTS: 'qf1'..'qf4','sf1','sf2','f' -> winner id.
+let QF_DRAW = [["TES","IG"],["GEN","LYON"],["DK","BLG"],["T1","KC"]];
 const KO_RESULTS = {};
 // ==== LIVE DATA END ====
 
@@ -866,6 +876,59 @@ const PCHAMP = {
  'KC:Busio':{Nautilus:[1,0]},'KC:Yike':{MonkeyKing:[1,0]},'KC:Kyeahoo':{Cassiopeia:[1,0]},'CFO:Doggo':{Caitlyn:[0,1]},
  'TES:JackeyLove':{Jhin:[0,1],Lucian:[1,0]},'TES:369':{Jayce:[0,1]},'BLG:Knight':{LeBlanc:[0,1]}
 };
+// lolesports data access shared by the site (browser) and the GitHub Action (Node 20+).
+// Unofficial lolesports.com API, public key published in community docs (github.com/vickz84259/lolesports-api-docs).
+(function (g) {
+  const LOLE = {
+    api: 'https://esports-api.lolesports.com/persisted/gw',
+    feed: 'https://feed.lolesports.com/livestats/v1',
+    key: '0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z',
+    league: '98767975604431411', // Worlds
+    since: '2026-10-01T00:00:00Z'
+  };
+  // Keep only what the site needs from schedule events.
+  function slim(events) {
+    const seen = new Set(), out = [];
+    (events || []).forEach(e => {
+      if (!e || e.type !== 'match' || !e.match || !e.match.id || seen.has(e.match.id)) return;
+      if ((e.startTime || '') < LOLE.since) return;
+      seen.add(e.match.id);
+      out.push({
+        id: e.match.id, start: e.startTime, state: e.state, block: e.blockName || '',
+        bo: (e.match.strategy && e.match.strategy.count) || null,
+        teams: (e.match.teams || []).map(t => ({
+          code: t.code || '', name: t.name || '',
+          win: t.result ? (t.result.outcome || null) : null,
+          gw: t.result && typeof t.result.gameWins === 'number' ? t.result.gameWins : null,
+          rec: t.record ? { w: t.record.wins, l: t.record.losses } : null
+        }))
+      });
+    });
+    return out.sort((a, b) => (a.start || '').localeCompare(b.start || '') || a.id.localeCompare(b.id));
+  }
+  // get(path, params) -> parsed JSON from the esports API
+  async function fetchWorldsEvents(get, league) {
+    league = league || LOLE.league;
+    const first = await get('/getSchedule', { leagueId: league });
+    const sch = first.data.schedule;
+    let events = (sch.events || []).slice();
+    let older = sch.pages && sch.pages.older, newer = sch.pages && sch.pages.newer, n = 0;
+    const earliest = () => events.reduce((m, e) => (e.startTime < m ? e.startTime : m), '9999');
+    while (older && n < 8 && earliest() > LOLE.since) {
+      const d = await get('/getSchedule', { leagueId: league, pageToken: older });
+      events = (d.data.schedule.events || []).concat(events);
+      older = d.data.schedule.pages && d.data.schedule.pages.older; n++;
+    }
+    n = 0;
+    while (newer && n < 3) {
+      const d = await get('/getSchedule', { leagueId: league, pageToken: newer });
+      events = events.concat(d.data.schedule.events || []);
+      newer = d.data.schedule.pages && d.data.schedule.pages.newer; n++;
+    }
+    return slim(events);
+  }
+  g.LOLE_CORE = { LOLE, slim, fetchWorldsEvents };
+})(typeof globalThis !== 'undefined' ? globalThis : window);
 // ===================== MODEL =====================
 const ROLES=['top','jng','mid','bot','sup'];
 const ROLE_KO={top:'탑',jng:'정글',mid:'미드',bot:'원딜',sup:'서폿'};
@@ -1180,7 +1243,7 @@ function route(){const v=(location.hash||'#worlds').slice(1);const ok=['live','v
 window.addEventListener('hashchange',route);
 
 // =============== 1. LIVE ===============
-const L={B:{tid:'G2',pids:defaultLineup('G2')},R:{tid:'HLE',pids:defaultLineup('HLE')},
+const L={B:{tid:'TES',pids:defaultLineup('TES')},R:{tid:'IG',pids:defaultLineup('IG')},
   step:0,bans:{B:[],R:[]},picks:{B:{},R:{}},manual:{B:false,R:false},hist:[],locked:new Set(),wp:[],sel:null,roleF:'all',q:'',timerOn:false,tleft:30,example:true};
 function liveState(){return{bans:L.bans,picks:L.picks}}
 function snapshot(){return JSON.stringify({step:L.step,bans:L.bans,picks:L.picks,manual:L.manual,wp:L.wp})}
@@ -1601,6 +1664,228 @@ function renderIG(){
       <div><div class="lbl" style="margin:12px 0 6px">시간대별 승률 (블루)</div><svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto" role="img" aria-label="경기 시간에 따른 블루 승률">${svg}</svg>
       <p class="note">‘현재 상태 기록’이나 +1·+5분 버튼을 누르면 그래프에 점이 찍힙니다.</p></div></div>`;
 }
+// =============== LIVE DATA SYNC ===============
+// 1) Try the lolesports API straight from the browser. 2) Fall back to data/schedule.json that the
+// GitHub Action refreshes every ~10 min. 3) Otherwise keep the data embedded in this page.
+const { LOLE } = LOLE_CORE;
+const SYNC = { mode: 'static', direct: null, at: null, updated: null, events: null, err: '', timer: null, game: null, gameTimer: null, gameMsg: '' };
+const RAW_JSON = 'https://raw.githubusercontent.com/ohang2/rift-oracle/main/data/schedule.json';
+const TEAM_CODE = { GEN: 'GEN', GENG: 'GEN', HLE: 'HLE', T1: 'T1', DK: 'DK', DPLUS: 'DK', BLG: 'BLG', AL: 'AL', TES: 'TES', IG: 'IG',
+  G2: 'G2', MKOI: 'MKOI', KOI: 'MKOI', KC: 'KC', TL: 'TL', TLAW: 'TL', LYON: 'LYON', LYN: 'LYON', TSW: 'TSW', CFO: 'CFO', LOS: 'LOS',
+  'LØS': 'LOS', C9: 'C9', FUR: 'FUR', FURIA: 'FUR', MVK: 'MVK' };
+const TEAM_NAME = [[/gen\.?g/i, 'GEN'], [/hanwha/i, 'HLE'], [/^t1$/i, 'T1'], [/dplus|dwg/i, 'DK'], [/bilibili/i, 'BLG'], [/anyone/i, 'AL'],
+  [/top esports/i, 'TES'], [/invictus/i, 'IG'], [/^g2/i, 'G2'], [/movistar|koi/i, 'MKOI'], [/karmine/i, 'KC'], [/liquid/i, 'TL'],
+  [/lyon/i, 'LYON'], [/secret whales/i, 'TSW'], [/ctbc|flying oyster/i, 'CFO'], [/^l[øo]s$/i, 'LOS'], [/cloud9/i, 'C9'], [/furia/i, 'FUR'], [/mvk/i, 'MVK']];
+function mapTeam(t) {
+  if (!t) return null; const c = (t.code || '').toUpperCase();
+  if (TEAM_CODE[c] && TEAMS[TEAM_CODE[c]]) return TEAM_CODE[c];
+  for (const [re, id] of TEAM_NAME) if (re.test(t.name || '')) return id;
+  return null;
+}
+function fetchT(u, o, ms) { const c = new AbortController(); const t = setTimeout(() => c.abort(), ms || 8000); return fetch(u, { ...(o || {}), signal: c.signal }).finally(() => clearTimeout(t)); }
+async function apiGet(path, params) {
+  const u = new URL(LOLE.api + path); Object.entries({ hl: 'en-US', ...params }).forEach(([k, v]) => u.searchParams.set(k, v));
+  const r = await fetchT(u, { headers: { 'x-api-key': LOLE.key } }); if (!r.ok) throw new Error(path + ' ' + r.status); return r.json();
+}
+async function feedGet(path, params) {
+  const u = new URL(LOLE.feed + path); Object.entries(params || {}).forEach(([k, v]) => u.searchParams.set(k, v));
+  const r = await fetchT(u); if (r.status === 204) return null; if (!r.ok) throw new Error(path + ' ' + r.status); return r.json();
+}
+const kstShort = iso => { const k = new Date(Date.parse(iso) + 9 * 3600e3); return `${k.getUTCMonth() + 1}/${k.getUTCDate()}(${'일월화수목금토'[k.getUTCDay()]}) ${String(k.getUTCHours()).padStart(2, '0')}:${String(k.getUTCMinutes()).padStart(2, '0')}`; };
+const KO_KO = { qf: '8강', sf: '4강', f: '결승' };
+
+async function loadEvents() {
+  if (SYNC.direct !== false) {
+    try { const ev = await LOLE_CORE.fetchWorldsEvents(apiGet); if (ev.length) { SYNC.direct = true; return { events: ev, updated: new Date().toISOString(), mode: 'api' }; } }
+    catch (e) { SYNC.direct = false; SYNC.err = e.message; }
+  }
+  const tries = await Promise.allSettled([
+    fetchT('data/schedule.json?t=' + Date.now(), { cache: 'no-store' }).then(r => r.ok ? r.json() : null),
+    fetchT(RAW_JSON + '?t=' + Date.now(), { cache: 'no-store' }).then(r => r.ok ? r.json() : null)
+  ]);
+  const got = tries.map(t => t.status === 'fulfilled' ? t.value : null).filter(d => d && Array.isArray(d.events) && d.events.length)
+    .sort((a, b) => (b.updated || '').localeCompare(a.updated || ''))[0];
+  return got ? { events: got.events, updated: got.updated, mode: 'file' } : null;
+}
+
+function stageOf(block) {
+  const b = (block || '').toLowerCase();
+  if (/play.?in/.test(b)) return 'pi';
+  if (/quarter/.test(b)) return 'qf';
+  if (/semi/.test(b)) return 'sf';
+  if (/final/.test(b)) return 'f';
+  if (/knockout|bracket|playoff/.test(b)) return 'ko';
+  return 'sw';
+}
+function applyEvents(events) {
+  const M = events.map(e => { const [x, y] = e.teams || []; return { ...e, x, y, a: mapTeam(x), b: mapTeam(y), stage: stageOf(e.block) }; })
+    .filter(m => m.a && m.b && m.a !== m.b && MAIN.includes(m.a) && MAIN.includes(m.b) && m.stage !== 'pi');
+  const ko = M.filter(m => m.stage === 'ko');
+  ko.forEach((m, i) => m.stage = i < 4 ? 'qf' : i < 6 ? 'sf' : 'f');
+  const winnerOf = m => {
+    if (m.state !== 'completed') return null;
+    if (m.x.win === 'win') return m.a; if (m.y.win === 'win') return m.b;
+    if (m.x.gw != null && m.y.gw != null && m.x.gw !== m.y.gw) return m.x.gw > m.y.gw ? m.a : m.b;
+    return null;
+  };
+  const gws = (m, w) => { const W = w === m.a ? m.x : m.y, Lt = w === m.a ? m.y : m.x; return [W.gw != null ? W.gw : 1, Lt.gw != null ? Lt.gw : 0]; };
+  // --- Swiss: rebuild results in time order, deriving the round from each team's record
+  const sw = M.filter(m => m.stage === 'sw');
+  const rec = {}; MAIN.forEach(t => rec[t] = { w: 0, l: 0 });
+  const res = [];
+  sw.forEach(m => {
+    m.round = Math.max(rec[m.a].w + rec[m.a].l, rec[m.b].w + rec[m.b].l) + 1;
+    m.recA = { ...rec[m.a] }; m.recB = { ...rec[m.b] };
+    const w = winnerOf(m); if (!w) return; const l = w === m.a ? m.b : m.a; const [wg, lg] = gws(m, w);
+    res.push([w, l, wg, lg, m.round]); rec[w].w++; rec[l].l++;
+  });
+  const pairKey = (a, b) => [a, b].sort().join('|');
+  if (res.length >= SWISS.length) { SWISS.length = 0; res.forEach(r => SWISS.push(r)); }
+  else { const have = new Set(SWISS.map(r => pairKey(r[0], r[1]))); res.forEach(r => { if (!have.has(pairKey(r[0], r[1]))) SWISS.push(r); }); }
+  // --- Knockouts
+  const byStage = s => M.filter(m => m.stage === s);
+  let qfs = byStage('qf'); const sfs = byStage('sf'), fin = byStage('f');
+  if (qfs.length === 4) {
+    if (sfs[0]) { const [t1, t2] = [sfs[0].a, sfs[0].b]; const i = qfs.findIndex(q => q.a === t1 || q.b === t1), j = qfs.findIndex(q => q.a === t2 || q.b === t2);
+      if (i >= 0 && j >= 0 && i !== j) qfs = [qfs[i], qfs[j], ...qfs.filter((_, k) => k !== i && k !== j)]; }
+    QF_DRAW = qfs.map(q => [q.a, q.b]);
+    Object.keys(KO_RESULTS).forEach(k => delete KO_RESULTS[k]);
+    qfs.forEach((q, i) => { const w = winnerOf(q); if (w) KO_RESULTS['qf' + (i + 1)] = w; });
+    const side1 = new Set([...QF_DRAW[0], ...QF_DRAW[1]]);
+    sfs.forEach(s => { const w = winnerOf(s); if (w) KO_RESULTS[side1.has(s.a) || side1.has(s.b) ? 'sf1' : 'sf2'] = w; });
+    if (fin[0]) { const w = winnerOf(fin[0]); if (w) KO_RESULTS.f = w; }
+  }
+  // --- Upcoming / live matches
+  const staticId = m => { const g = GAME_MATCHES.find(x => pairKey(x.a, x.b) === pairKey(m.a, m.b) && Math.abs(Date.parse(x.start) - Date.parse(m.start)) < 12 * 3600e3); return g ? g.id : null; };
+  const stakeOf = m => {
+    if (m.stage !== 'sw') return KO_KO[m.stage];
+    const A = m.recA || rec[m.a], B = m.recB || rec[m.b];
+    if (A.w === 2 && A.l === 2) return '승자 8강 · 패자 탈락';
+    if (A.w === 2 || B.w === 2) return '승자 8강 진출';
+    if (A.l === 2 || B.l === 2) return '패자 탈락';
+    return '';
+  };
+  const open = M.filter(m => m.state !== 'completed');
+  if (sw.length >= 20) {
+    PENDING.length = 0;
+    open.forEach(m => {
+      const live = m.state === 'inProgress';
+      PENDING.push({ id: staticId(m) || 'm' + m.id, api: m.id, a: m.a, b: m.b, bo: m.bo || (m.stage === 'sw' ? 3 : 5), time: kstShort(m.start) + (live ? ` · 진행 중 ${m.x.gw || 0}:${m.y.gw || 0}` : ''),
+        stake: stakeOf(m), stage: m.stage === 'sw' ? undefined : 'ko', live });
+    });
+  }
+  // --- Challenge: open new matches, update start times, score finished ones
+  M.forEach(m => {
+    const id = staticId(m) || 'm' + m.id; let g = GAME_MATCHES.find(x => x.id === id);
+    if (!g && m.state === 'unstarted') { g = { id, a: m.a, b: m.b, bo: m.bo || 3, start: m.start, label: m.stage === 'sw' ? `스위스 ${m.round}R · ${stakeOf(m)}` : KO_KO[m.stage] }; GAME_MATCHES.push(g); }
+    if (!g) return;
+    if (m.state === 'unstarted' && m.start) g.start = m.start;
+    const w = winnerOf(m); if (w && !OFFICIAL[id]) { const [wg, lg] = gws(m, w); OFFICIAL[id] = { w, s: `${wg}-${lg}` }; }
+  });
+  GAME_MATCHES.sort((x, y) => x.start.localeCompare(y.start));
+  // --- Stage cards
+  const qualified = MAIN.filter(t => rec[t].w >= 3).map(AB);
+  const anyKo = M.some(m => m.stage !== 'sw'), finStarted = fin.some(m => m.state !== 'unstarted');
+  const r5 = sw.some(m => m.round >= 5);
+  SCHEDULE.forEach(s => s.now = 0);
+  const cur = finStarted ? 3 : anyKo ? 2 : r5 ? 1 : 0; SCHEDULE[cur].now = 1;
+  if (cur <= 1) SCHEDULE[cur].s = `진행 중 · 8강 확정 ${qualified.length}팀: ${qualified.join(', ')}`;
+  if (cur === 0) SCHEDULE[1].s = '2승 2패 팀끼리 3판 2선승';
+  if (cur >= 2) { SCHEDULE[0].s = '종료'; SCHEDULE[1].s = '종료 · 8강: ' + qualified.join(', '); SCHEDULE[2].s = KO_RESULTS.sf1 || KO_RESULTS.sf2 ? '결승 진출: ' + [KO_RESULTS.sf1, KO_RESULTS.sf2].filter(Boolean).map(AB).join(', ') : SCHEDULE[2].s; }
+  if (KO_RESULTS.f) SCHEDULE[3].s = `우승: ${AB(KO_RESULTS.f)}`;
+  return M;
+}
+
+function afterApply() {
+  computeForm(); Object.keys(FORM_OFF).forEach(k => delete FORM_OFF[k]); Object.assign(FORM_OFF, FORM);
+  const st = $('#stamp'); if (st) st.textContent = SYNC.updated ? `${kstShort(SYNC.updated)} KST · 자동` : DATA_STAMP;
+  if (W.ran) runWorlds();
+  renderGame(); renderLiveBanners(); renderLive();
+}
+function renderLiveBanners() {
+  const live = PENDING.filter(p => p.live);
+  const src = SYNC.mode === 'api' ? '경기 결과 실시간 연동 중' : SYNC.mode === 'file' ? '경기 결과 자동 갱신 중 (약 10분 간격)' : '자동 갱신 연결 안 됨 · 저장된 데이터 사용';
+  const html = `<div class="syncbar"><span class="dot ${SYNC.mode}"></span><span>${src}${SYNC.updated ? ` · 마지막 반영 ${kstShort(SYNC.updated)}` : ''}</span></div>` +
+    live.map(p => `<div class="livebar"><span class="lv">LIVE</span><b>${AB(p.a)}</b><span class="num">${esc(p.time.split('진행 중 ')[1] || '')}</span><b>${AB(p.b)}</b><span class="muted">${esc(p.stake || '')} · ${p.bo}판 ${Math.ceil(p.bo / 2)}선승</span>
+      ${SYNC.direct ? `<button class="btn" data-live="${p.api}">실시간 예측에서 자동 연동</button>` : `<span class="muted">인게임 수치는 실시간 예측 탭에서 직접 입력</span>`}</div>`).join('');
+  ['#wLive', '#lLive'].forEach(s => { const el = $(s); if (el) el.innerHTML = html; });
+  document.querySelectorAll('[data-live]').forEach(b => b.onclick = () => startGameSync(b.dataset.live));
+  const g = $('#gameSync'); if (g) g.innerHTML = SYNC.game ? `<span class="lv">자동</span> ${esc(SYNC.gameMsg)} <button class="btn" id="gsStop">자동 연동 끄기</button>` : '';
+  const stop = $('#gsStop'); if (stop) stop.onclick = stopGameSync;
+}
+async function syncOnce() {
+  try {
+    const got = await loadEvents();
+    if (!got) { SYNC.mode = 'static'; renderLiveBanners(); return; }
+    SYNC.mode = got.mode; SYNC.updated = got.updated; SYNC.events = got.events;
+    applyEvents(got.events); afterApply();
+  } catch (e) { SYNC.err = e.message; renderLiveBanners(); }
+  finally {
+    clearTimeout(SYNC.timer);
+    const anyLive = PENDING.some(p => p.live);
+    SYNC.timer = setTimeout(syncOnce, SYNC.mode === 'api' ? (anyLive ? 60e3 : 180e3) : 300e3);
+  }
+}
+
+// ---- in-game auto sync (only when the browser can reach the API directly)
+const ROLE_API = { top: 'top', jungle: 'jng', mid: 'mid', bottom: 'bot', support: 'sup' };
+function champKey(id) { const s = String(id || '').toLowerCase().replace(/[^a-z]/g, ''); return CH_LIST.find(c => c.key.toLowerCase() === s)?.key || null; }
+function findPlayer(tid, summoner, role) {
+  const nm = String(summoner || '').trim().split(/\s+/).pop().toLowerCase();
+  return TEAMS[tid].players.find(p => p.name.toLowerCase() === nm)?.pid || TEAMS[tid].starters[role];
+}
+const iso10 = ms => new Date(Math.floor(ms / 10000) * 10000).toISOString().replace('.000', '');
+async function startGameSync(matchId) {
+  stopGameSync();
+  SYNC.game = { matchId, gameId: null, startTs: null, lastMin: -1 }; SYNC.gameMsg = '경기 정보를 불러오는 중…';
+  location.hash = '#live'; renderLiveBanners();
+  await pollGame(true);
+}
+function stopGameSync() { clearTimeout(SYNC.gameTimer); SYNC.game = null; SYNC.gameMsg = ''; renderLiveBanners(); }
+async function pollGame(first) {
+  const G0 = SYNC.game; if (!G0) return;
+  try {
+    const det = await apiGet('/getEventDetails', { id: G0.matchId });
+    const match = det.data.event.match; const ev = (SYNC.events || []).find(e => e.id === G0.matchId);
+    const idMap = {}; match.teams.forEach((t, i) => { idMap[t.id] = mapTeam(t) || (ev && mapTeam(ev.teams[i])); });
+    const games = match.games || []; const game = games.find(g => g.state === 'inProgress') || games.filter(g => g.state === 'completed').pop();
+    if (!game) { SYNC.gameMsg = '아직 시작된 세트가 없습니다. 1분 후 다시 확인합니다.'; renderLiveBanners(); SYNC.gameTimer = setTimeout(pollGame, 60e3); return; }
+    if (G0.gameId !== game.id) { G0.gameId = game.id; G0.startTs = null; G0.lastMin = -1; first = true; }
+    if (!G0.startTs) { const w0 = await feedGet(`/window/${game.id}`); if (w0 && w0.frames && w0.frames[0]) { G0.startTs = Date.parse(w0.frames[0].rfc460Timestamp); G0.meta = w0.gameMetadata; } }
+    let win = null; for (const back of [60, 90, 130]) { win = await feedGet(`/window/${game.id}`, { startingTime: iso10(Date.now() - back * 1000) }); if (win && win.frames && win.frames.length) break; }
+    if (!win || !win.frames || !win.frames.length) { SYNC.gameMsg = `${game.number}세트 데이터 대기 중…`; renderLiveBanners(); SYNC.gameTimer = setTimeout(pollGame, 20e3); return; }
+    const meta = win.gameMetadata || G0.meta; const fr = win.frames[win.frames.length - 1];
+    const blue = idMap[meta.blueTeamMetadata.esportsTeamId], red = idMap[meta.redTeamMetadata.esportsTeamId];
+    if (!blue || !red) throw new Error('팀을 확인하지 못했습니다');
+    if (first || L.B.tid !== blue || L.R.tid !== red) {
+      // lineups and champions from the game itself; bans are not in the live feed
+      const side = (tid, tm) => { const pids = [], picks = {}; tm.participantMetadata.forEach(p => { const r = ROLE_API[p.role]; if (!r) return; const i = ROLES.indexOf(r); pids[i] = findPlayer(tid, p.summonerName, r); const k = champKey(p.championId); if (k) picks[r] = k; }); ROLES.forEach((r, i) => { if (!pids[i]) pids[i] = TEAMS[tid].starters[r]; }); return { pids, picks }; };
+      const sb = side(blue, meta.blueTeamMetadata), sr = side(red, meta.redTeamMetadata);
+      L.B = { tid: blue, pids: sb.pids }; L.R = { tid: red, pids: sr.pids };
+      L.bans = { B: [], R: [] }; L.picks = { B: sb.picks, R: sr.picks }; L.manual = { B: true, R: true }; L.step = 20; L.hist = []; L.wp = []; L.example = false;
+      $('#liveGame').value = String(game.number || 1);
+      L.ig = igBlank(); buildSetup('B'); buildSetup('R'); buildIG();
+    }
+    const T = { B: fr.blueTeam, R: fr.redTeam }; const ig = L.ig;
+    const ts = Date.parse(fr.rfc460Timestamp); const mins = G0.startTs ? Math.max(0, Math.floor((ts - G0.startTs) / 60000)) : ig.t;
+    ig.t = mins; const gd = T.B.totalGold - T.R.totalGold; ig.gdSide = gd >= 0 ? 1 : -1; ig.gd = String(Math.abs(Math.round(gd / 10) * 10));
+    ['B', 'R'].forEach(s => {
+      const t = T[s]; ig[s].tw = t.towers; ig[s].inh = t.inhibitors; ig[s].bar = t.barons;
+      ig[s].dr = (t.dragons || []).filter(d => d !== 'elder').length;
+      const metaSide = s === 'B' ? meta.blueTeamMetadata : meta.redTeamMetadata;
+      metaSide.participantMetadata.forEach(p => { const r = ROLE_API[p.role]; const st = (t.participants || []).find(x => x.participantId === p.participantId); if (r && st) ig.kda[s][ROLES.indexOf(r)] = [st.kills, st.deaths, st.assists]; });
+    });
+    if (mins !== G0.lastMin) { G0.lastMin = mins; saveIG(); }
+    buildIG(); renderAllLive();
+    const done = fr.gameState === 'finished';
+    SYNC.gameMsg = `${AB(blue)} vs ${AB(red)} ${game.number}세트 · ${mins}분 · 킬 ${T.B.totalKills}:${T.R.totalKills} · ${new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })} 갱신${done ? ' · 세트 종료' : ''} (중계보다 약 1분 늦음)`;
+    renderLiveBanners();
+    SYNC.gameTimer = setTimeout(pollGame, done ? 60e3 : 15e3);
+  } catch (e) {
+    SYNC.gameMsg = '실시간 경기 데이터를 받지 못했습니다 (' + e.message + '). 30초 후 다시 시도합니다.'; renderLiveBanners();
+    SYNC.gameTimer = setTimeout(pollGame, 30e3);
+  }
+}
 // =============== 3. WORLDS ===============
 const W={res:{},sim:null,ran:false,match:'r4b'};
 const MAIN=TEAM_ORDER.filter(t=>TEAMS[t].worlds===1);
@@ -1608,7 +1893,11 @@ function allResults(){return[...SWISS,...PENDING.filter(m=>W.res[m.id]&&m.stage!
 function records(results){const R={};MAIN.forEach(t=>R[t]={w:0,l:0,gw:0,gl:0,opp:[]});
   results.forEach(([w,l,wg,lg])=>{R[w].w++;R[l].l++;R[w].gw+=wg;R[w].gl+=lg;R[l].gw+=lg;R[l].gl+=wg;R[w].opp.push(l);R[l].opp.push(w)});return R}
 function shuffle(a,rnd){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function koMerged(){const K={...KO_RESULTS};if(!QF_DRAW)return K;const pk=(a,b)=>[a,b].sort().join('|');
+  PENDING.filter(m=>m.stage==='ko'&&W.res[m.id]).forEach(m=>{const w=W.res[m.id];const i=QF_DRAW.findIndex(q=>pk(q[0],q[1])===pk(m.a,m.b));
+    if(i>=0){K['qf'+(i+1)]=w;return}const s1=new Set([...QF_DRAW[0],...QF_DRAW[1]]);if(m.stake==='4강')K[s1.has(m.a)?'sf1':'sf2']=w;else if(m.stake==='결승')K.f=w});return K}
 function simWorlds(N){
+  const KO=koMerged();
   computeForm(allResults().slice(SWISS.length));
   const base=records(allResults());const rnd=mulberry(hash(JSON.stringify(W.res))+99);
   const memo={};const ps=(a,b,bo)=>{const k=a+b+bo;if(memo[k]==null)memo[k]=pSeries(pGame(a,b),bo);return memo[k]};
@@ -1634,10 +1923,10 @@ function simWorlds(N){
     qf=best}
     qf.flat().forEach(t=>C[t].qf++);
     inc(S.qf1b,qf[0][1]);inc(S.qf3b,qf[2][1]);[qf[1],qf[3]].forEach(pr=>{inc(S.qf2,[...pr].sort().join('|'));pr.forEach(t=>inc(S.qf2t,t))});
-    const wq=qf.map(([a,b],i)=>KO_RESULTS['qf'+(i+1)]||(rnd()<ps(a,b,5)?a:b));wq.forEach(t=>C[t].sf++);
+    const wq=qf.map(([a,b],i)=>KO['qf'+(i+1)]||(rnd()<ps(a,b,5)?a:b));wq.forEach(t=>C[t].sf++);
     inc(S.sf1a,wq[0]);inc(S.sf1b,wq[1]);inc(S.sf2a,wq[2]);inc(S.sf2b,wq[3]);
-    const f1=KO_RESULTS.sf1||(rnd()<ps(wq[0],wq[1],5)?wq[0]:wq[1]),f2=KO_RESULTS.sf2||(rnd()<ps(wq[2],wq[3],5)?wq[2]:wq[3]);C[f1].fin++;C[f2].fin++;inc(S.fa,f1);inc(S.fb,f2);
-    const ch=KO_RESULTS.f||(rnd()<ps(f1,f2,5)?f1:f2);C[ch].win++;inc(S.ch,ch);
+    const f1=KO.sf1||(rnd()<ps(wq[0],wq[1],5)?wq[0]:wq[1]),f2=KO.sf2||(rnd()<ps(wq[2],wq[3],5)?wq[2]:wq[3]);C[f1].fin++;C[f2].fin++;inc(S.fa,f1);inc(S.fb,f2);
+    const ch=KO.f||(rnd()<ps(f1,f2,5)?f1:f2);C[ch].win++;inc(S.ch,ch);
   }
   return{N,C,S,base}}
 function topOf(o,N,n){return Object.entries(o).sort((a,b)=>b[1]-a[1]).slice(0,n||3).map(([k,v])=>({k,p:v/N}))}
@@ -1657,6 +1946,7 @@ function runWorlds(){
     <div class="tm r"><b>${esc(TEAMS[m.b].ab)}</b><span class="muted">${base[m.b].w}-${base[m.b].l}</span><button class="wb${set===m.b?' on':''}" data-m="${m.id}" data-w="${m.b}">${set===m.b?'✓ 승리':'승리 입력'}</button></div></div>`}).join('');
   $('#wPend').querySelectorAll('.wb').forEach(b=>b.onclick=()=>{const id=b.dataset.m;W.res[id]=W.res[id]===b.dataset.w?undefined:b.dataset.w;if(!W.res[id])delete W.res[id];runWorlds()});
   const p22=MAIN.filter(t=>base[t].w===2&&base[t].l===2);
+  $('#wR5').hidden=!!QF_DRAW;
   $('#wR5').innerHTML=`5라운드(2승 2패 6팀, 3판 2선승) 대진은 4라운드가 끝나면 추첨됩니다. 현재 2승 2패: ${p22.map(t=>TEAMS[t].ab).join(', ')||'—'} + 4라운드 결과에 따라 합류.`;
   // bracket
   const nm=t=>esc(TEAMS[t].ab);
@@ -1669,7 +1959,7 @@ function runWorlds(){
   const chTop=topOf(S.ch,N,3);
   const eq=new Set(),es=new Set(),ef=new Set();
   let q1,q2,q3,q4;
-  if(QF_DRAW){[q1,q2,q3,q4]=QF_DRAW.map(([a,b],i)=>{const w=KO_RESULTS['qf'+(i+1)];return`<div class="bm">${[a,b].map(t=>`<div class="bt fix"><b>${nm(t)}</b><span>${w?(w===t?'승':''):'확정'}</span></div>`).join('')}</div>`})}
+  if(QF_DRAW){const KO=koMerged();[q1,q2,q3,q4]=QF_DRAW.map(([a,b],i)=>{const w=KO['qf'+(i+1)];return`<div class="bm">${[a,b].map(t=>`<div class="bt fix"><b>${nm(t)}</b><span>${w?(w===t?'승':''):'확정'}</span></div>`).join('')}</div>`})}
   else{q1=box(slot(null,'GEN',eq),slot(S.qf1b,null,eq));q3=box(slot(null,'DK',eq),slot(S.qf3b,null,eq));q2=pairBox(S.qf2,S.qf2t,eq);q4=pairBox(S.qf2,S.qf2t,eq)}
   $('#wBracket').innerHTML=`
     <div class="bcol"><h4>8강</h4><div class="bcb">${q1}${q2}${q3}${q4}</div></div>
@@ -1681,10 +1971,10 @@ function runWorlds(){
   $('#wOdds').innerHTML=od.map(t=>`<div class="o"><span>${nm(t)}</span><div class="ob"><i style="width:${C[t].win/mxw*100}%"></i></div><span class="num" style="text-align:right">${(C[t].win/N*100).toFixed(1)}%</span></div>`).join('');
   // match select
   const opts=PENDING.filter(m=>!W.res[m.id]).map(m=>`<option value="${m.id}">${TEAMS[m.a].ab} vs ${TEAMS[m.b].ab} · ${m.time}</option>`);
-  const qfp=[[ 'GEN',topOf(S.qf1b,N,1)[0]],['DK',topOf(S.qf3b,N,1)[0]]].map(([a,t])=>`<option value="qf:${a}:${t.k}">8강 예상: ${TEAMS[a].ab} vs ${TEAMS[t.k].ab} (${pct(t.p)}%)</option>`);
-  topOf(S.qf2,N,2).forEach(q=>{{const[a,b]=q.k.split('|');qfp.push(`<option value="qf:${a}:${b}">8강 예상: ${TEAMS[a].ab} vs ${TEAMS[b].ab} (${pct(q.p)}%)</option>`)}});
+  const qfp=QF_DRAW?[]:[[ 'GEN',topOf(S.qf1b,N,1)[0]],['DK',topOf(S.qf3b,N,1)[0]]].map(([a,t])=>`<option value="qf:${a}:${t.k}">8강 예상: ${TEAMS[a].ab} vs ${TEAMS[t.k].ab} (${pct(t.p)}%)</option>`);
+  if(!QF_DRAW)topOf(S.qf2,N,2).forEach(q=>{{const[a,b]=q.k.split('|');qfp.push(`<option value="qf:${a}:${b}">8강 예상: ${TEAMS[a].ab} vs ${TEAMS[b].ab} (${pct(q.p)}%)</option>`)}});
   const sel=$('#wMatch');const prev=W.match;
-  sel.innerHTML=`<optgroup label="남은 경기">${opts.join('')}</optgroup><optgroup label="8강 예상 대진">${qfp.join('')}</optgroup><option value="custom">직접 고르기…</option>`;
+  sel.innerHTML=`<optgroup label="남은 경기">${opts.join('')}</optgroup>${qfp.length?`<optgroup label="8강 예상 대진">${qfp.join('')}</optgroup>`:''}<option value="custom">직접 고르기…</option>`;
   if([...sel.options].some(o=>o.value===prev))sel.value=prev;else{sel.selectedIndex=0;W.match=sel.value}
   $('#wCA').innerHTML=teamSelectHTML(W.ca||'GEN',true);$('#wCB').innerHTML=teamSelectHTML(W.cb||'T1',true);
   renderMatch();
@@ -1731,6 +2021,7 @@ function bindWorlds(){
 // =============== boot ===============
 {const st=document.getElementById('stamp');if(st)st.textContent=DATA_STAMP;}
 liveExample();bindLive();buildIG();renderAllLive();bindVirtual();bindWorlds();bindGame();route();
+renderLiveBanners();syncOnce();
 </script>
 
 </body>
