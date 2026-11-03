@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-01T08:32:54.993Z",
+ "updated": "2026-11-03T22:24:26.428Z",
  "league": "98767975604431411",
  "events": [
   {
@@ -1136,13 +1136,13 @@
   {
    "id": "115660540726095109",
    "start": "2026-11-03T22:00:00Z",
-   "state": "unstarted",
+   "state": "inProgress",
    "block": "Quarterfinals",
    "bo": 5,
    "teams": [
     {
-     "code": "TES",
-     "name": "TOP ESPORTS",
+     "code": "IG",
+     "name": "Invictus Gaming",
      "win": null,
      "gw": 0,
      "rec": {
@@ -1151,8 +1151,8 @@
      }
     },
     {
-     "code": "IG",
-     "name": "Invictus Gaming",
+     "code": "TES",
+     "name": "TOP ESPORTS",
      "win": null,
      "gw": 0,
      "rec": {
