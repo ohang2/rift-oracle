@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-03T22:24:26.428Z",
+ "updated": "2026-11-03T23:11:01.412Z",
  "league": "98767975604431411",
  "events": [
   {
@@ -1144,7 +1144,7 @@
      "code": "IG",
      "name": "Invictus Gaming",
      "win": null,
-     "gw": 0,
+     "gw": 1,
      "rec": {
       "w": 0,
       "l": 0
