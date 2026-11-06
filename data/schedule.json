@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-06T00:04:15.959Z",
+ "updated": "2026-11-06T01:06:30.821Z",
  "league": "98767975604431411",
  "events": [
   {
@@ -1194,28 +1194,28 @@
   {
    "id": "115660540726095097",
    "start": "2026-11-05T22:00:00Z",
-   "state": "inProgress",
+   "state": "completed",
    "block": "Quarterfinals",
    "bo": 5,
    "teams": [
     {
      "code": "BLG",
      "name": "BILIBILI GAMING",
-     "win": null,
-     "gw": 2,
+     "win": "win",
+     "gw": 3,
      "rec": {
-      "w": 0,
+      "w": 1,
       "l": 0
      }
     },
     {
      "code": "DK",
      "name": "Dplus KIA",
-     "win": null,
+     "win": "loss",
      "gw": 0,
      "rec": {
       "w": 0,
-      "l": 0
+      "l": 1
      }
     }
    ]
@@ -1293,11 +1293,14 @@
      "rec": null
     },
     {
-     "code": "TBD",
-     "name": "TBD",
+     "code": "BLG",
+     "name": "BILIBILI GAMING",
      "win": null,
-     "gw": null,
-     "rec": null
+     "gw": 0,
+     "rec": {
+      "w": 1,
+      "l": 0
+     }
     }
    ]
   },
