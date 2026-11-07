@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-07T02:19:49.352Z",
+ "updated": "2026-11-07T22:15:19.956Z",
  "league": "98767975604431411",
  "events": [
   {
@@ -1252,7 +1252,7 @@
   {
    "id": "115660540726095127",
    "start": "2026-11-07T22:00:00Z",
-   "state": "unstarted",
+   "state": "inProgress",
    "block": "Semifinals",
    "bo": 5,
    "teams": [
