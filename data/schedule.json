@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-08T01:47:58.125Z",
+ "updated": "2026-11-08T22:25:53.643Z",
  "league": "98767975604431411",
  "events": [
   {
@@ -1281,13 +1281,13 @@
   {
    "id": "115660540726095121",
    "start": "2026-11-08T22:00:00Z",
-   "state": "unstarted",
+   "state": "inProgress",
    "block": "Semifinals",
    "bo": 5,
    "teams": [
     {
-     "code": "T1",
-     "name": "T1",
+     "code": "BLG",
+     "name": "BILIBILI GAMING",
      "win": null,
      "gw": 0,
      "rec": {
@@ -1296,8 +1296,8 @@
      }
     },
     {
-     "code": "BLG",
-     "name": "BILIBILI GAMING",
+     "code": "T1",
+     "name": "T1",
      "win": null,
      "gw": 0,
      "rec": {
