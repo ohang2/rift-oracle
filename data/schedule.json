@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-07T23:57:33.120Z",
+ "updated": "2026-11-08T01:47:58.125Z",
  "league": "98767975604431411",
  "events": [
   {
@@ -1147,7 +1147,7 @@
      "gw": 3,
      "rec": {
       "w": 1,
-      "l": 0
+      "l": 1
      }
     },
     {
@@ -1175,7 +1175,7 @@
      "win": "win",
      "gw": 3,
      "rec": {
-      "w": 1,
+      "w": 2,
       "l": 0
      }
     },
@@ -1252,28 +1252,28 @@
   {
    "id": "115660540726095127",
    "start": "2026-11-07T22:00:00Z",
-   "state": "inProgress",
+   "state": "completed",
    "block": "Semifinals",
    "bo": 5,
    "teams": [
     {
      "code": "GEN",
      "name": "Gen.G Esports",
-     "win": null,
-     "gw": 2,
+     "win": "win",
+     "gw": 3,
      "rec": {
-      "w": 1,
+      "w": 2,
       "l": 0
      }
     },
     {
      "code": "IG",
      "name": "Invictus Gaming",
-     "win": null,
+     "win": "loss",
      "gw": 0,
      "rec": {
       "w": 1,
-      "l": 0
+      "l": 1
      }
     }
    ]
@@ -1322,11 +1322,14 @@
      "rec": null
     },
     {
-     "code": "TBD",
-     "name": "TBD",
+     "code": "GEN",
+     "name": "Gen.G Esports",
      "win": null,
-     "gw": null,
-     "rec": null
+     "gw": 0,
+     "rec": {
+      "w": 2,
+      "l": 0
+     }
     }
    ]
   }
