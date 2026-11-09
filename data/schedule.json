@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-09T00:13:35.568Z",
+ "updated": "2026-11-09T01:27:40.214Z",
  "league": "98767975604431411",
  "events": [
   {
@@ -1289,7 +1289,7 @@
      "code": "BLG",
      "name": "BILIBILI GAMING",
      "win": null,
-     "gw": 1,
+     "gw": 2,
      "rec": {
       "w": 1,
       "l": 0
