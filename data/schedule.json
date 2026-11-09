@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-09T01:27:40.214Z",
+ "updated": "2026-11-09T02:27:47.561Z",
  "league": "98767975604431411",
  "events": [
   {
@@ -1204,7 +1204,7 @@
      "win": "win",
      "gw": 3,
      "rec": {
-      "w": 1,
+      "w": 2,
       "l": 0
      }
     },
@@ -1234,7 +1234,7 @@
      "gw": 3,
      "rec": {
       "w": 1,
-      "l": 0
+      "l": 1
      }
     },
     {
@@ -1281,28 +1281,28 @@
   {
    "id": "115660540726095121",
    "start": "2026-11-08T22:00:00Z",
-   "state": "inProgress",
+   "state": "completed",
    "block": "Semifinals",
    "bo": 5,
    "teams": [
     {
      "code": "BLG",
      "name": "BILIBILI GAMING",
-     "win": null,
-     "gw": 2,
+     "win": "win",
+     "gw": 3,
      "rec": {
-      "w": 1,
+      "w": 2,
       "l": 0
      }
     },
     {
      "code": "T1",
      "name": "T1",
-     "win": null,
+     "win": "loss",
      "gw": 1,
      "rec": {
       "w": 1,
-      "l": 0
+      "l": 1
      }
     }
    ]
@@ -1315,15 +1315,18 @@
    "bo": 5,
    "teams": [
     {
-     "code": "TBD",
-     "name": "TBD",
-     "win": null,
-     "gw": null,
-     "rec": null
-    },
-    {
      "code": "GEN",
      "name": "Gen.G Esports",
+     "win": null,
+     "gw": 0,
+     "rec": {
+      "w": 2,
+      "l": 0
+     }
+    },
+    {
+     "code": "BLG",
+     "name": "BILIBILI GAMING",
      "win": null,
      "gw": 0,
      "rec": {
